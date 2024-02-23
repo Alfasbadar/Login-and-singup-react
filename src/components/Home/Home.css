@@ -1,0 +1,38 @@
+
+.home-container {
+    display: flex;
+    flex-direction: row; /* Align items horizontally */
+  }
+  
+  .navbar-container {
+    width: 15%;
+  }
+  
+  .content {
+    width: 85%;
+  }
+  
+  /* Additional styling for Navbar */
+  .navbar {
+    background-color: #333;
+    padding: 20px;
+  }
+  
+  .navbar ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .navbar ul li {
+    margin-bottom: 10px;
+  }
+  
+  .navbar ul li a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .navbar ul li a.active {
+    font-weight: bold;
+  }
+  

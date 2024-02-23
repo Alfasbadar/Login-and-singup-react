@@ -1,0 +1,1 @@
+todo: pin window in home aligned vertical. when contents in home is useLinkClickHandler, contents in window renders accordingly.accordingly
