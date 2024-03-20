@@ -1,38 +1,103 @@
+/* Global Styles */
+* {
+  box-sizing: border-box;
+}
 
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* Home Component Styles */
 .home-container {
-    display: flex;
-    flex-direction: row; /* Align items horizontally */
-  }
-  
-  .navbar-container {
-    width: 15%;
-  }
-  
-  .content {
-    width: 85%;
-  }
-  
-  /* Additional styling for Navbar */
-  .navbar {
-    background-color: #333;
-    padding: 20px;
-  }
-  
-  .navbar ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .navbar ul li {
-    margin-bottom: 10px;
-  }
-  
-  .navbar ul li a {
-    color: #fff;
-    text-decoration: none;
-  }
-  
-  .navbar ul li a.active {
-    font-weight: bold;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+}
+
+.company-name {
+  font-weight: bold;
+}
+
+.action-buttons {
+  display: flex;
+}
+
+.profile-button,
+.logout-button {
+  cursor: pointer;
+  margin-left: 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.profile-button:hover,
+.logout-button:hover {
+  background-color: #555;
+}
+
+.content {
+  display: flex;
+  flex: 1;
+}
+
+.navbar-container {
+  width: 200px; /* Adjust width as needed */
+  background-color: #f2f2f2; /* Background color of the navbar */
+  border-radius: 15px; /* Rounded corners */
+  overflow: hidden;
+}
+
+.navbar {
+  padding: 10px;
+}
+
+.navbar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.navbar ul li {
+  margin-bottom: 5px;
+}
+
+.navbar ul li a {
+  display: block;
+  padding: 10px;
+  border-radius: 15px; /* Rounded corners for each menu item */
+  color: #000; /* Default text color */
+  text-decoration: none;
+  position: relative; /* Position relative for sliding animation */
+  transition: background-color 0.3s ease-out; /* Transition for background color */
+}
+
+.navbar ul li a.active {
+  background-color: blue; /* Background color for selected menu */
+  color: white; /* Text color for selected menu */
+}
+
+
+.navbar ul li a:hover::before {
+  width: 100%; /* Ensure hover effect width is 100% */
+}
+
+.navbar ul li a.active:hover::before {
+  width: 0; /* Ensure hover effect width is 0 for the active item */
+}
+
+.navbar ul li a.active:hover {
+  background-color: blue; /* Background color for selected menu on hover */
+}
+
+.navbar ul li a.active:hover::before {
+  transform: translateY(-100%); /* Move the sliding border to the top */
+}
