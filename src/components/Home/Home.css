@@ -81,7 +81,7 @@ body {
 }
 
 .navbar ul li a.active {
-  background-color: blue; /* Background color for selected menu */
+  background-color: rgb(92, 138, 255); /* Background color for selected menu */
   color: white; /* Text color for selected menu */
 }
 
@@ -95,7 +95,7 @@ body {
 }
 
 .navbar ul li a.active:hover {
-  background-color: blue; /* Background color for selected menu on hover */
+  background-color: rgb(105, 158, 255); /* Background color for selected menu on hover */
 }
 
 .navbar ul li a.active:hover::before {

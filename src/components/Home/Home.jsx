@@ -1,5 +1,5 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import React,{useState} from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Navbar from '../NavBar/NavBar';
 import Products from '../Products/Products';
 import Inventory from '../Inventory/Invenetory';
@@ -8,21 +8,23 @@ import Stores from '../Stores/Stores';
 import Customers from '../Customers/Customers';
 import Dashboard from '../Dashboard/Dashboard'
 import Distribution from '../Distribution/Distribution';
-
-import { getAuth,signOut } from 'firebase/auth';
+import { logout } from '../../Database/Database';
 
 const Home = ({ user }) => {
-  console.log(user);
-  const handleLogoutClick = async() => {
-    console.log("Logout text click")
-    try{
-      const auth = getAuth();
-      await  signOut(auth);
-      Navigate('/home');
-    }catch(error){
-      console.log('Error Logging out:',error.message);
+  const navigate=useNavigate();
+
+  const [logoutAttempted, setLogoutAttempted] = useState(false);
+  const handleLogoutClick = async () => {
+    setLogoutAttempted(true)
+    const status=await logout();
+    if(status){
+      console.log("Logged out")
+      navigate('/');
     }
-  }
+    else{
+      console.log("Logout failed")
+    }
+  };
   return (
     <div className="home-container">
       <div className="action-bar">

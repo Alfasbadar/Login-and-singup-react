@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { getFirestore, collection, getDoc, setDoc, doc,addDoc,deleteDoc } from 'firebase/firestore';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from '../../config/firebase';
 import { useNavigate } from 'react-router-dom';
+import { login,signup } from "../../Database/Database";
 import "./LoginSignup.css";
 
 function LoginSignup() {
@@ -38,53 +37,27 @@ function LoginSignup() {
       setPasswordError('Password cannot be empty');
       return;
     }
-
-    try {
-      const auth = getAuth();
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log('Login successful!');
-      navigate('/home', { state: { email } });
-    } catch (error) {
-      console.error('Error signing in:', error.message);
+    if(login(email,password)){
+      console.log("Login success")
+      navigate('/home/dashboard')
     }
+    else{
+      console.log("Login error");
+    }
+
+
   };
 
   const handleSignup = async (e) => {
     e.preventDefault();
-
-    try {
-      const auth = getAuth();
-      await createUserWithEmailAndPassword(auth, email, password);
-      console.log('Account created successfully!');
-  
-      const db = getFirestore();
-
-      // Create users collection if not exist
-      const usersCollection = collection(db, 'users');
-  
-      // Create user document with email as ID
-      const userDocRef = doc(usersCollection, email);
-      await setDoc(userDocRef, {});
-  
-      // Create Personal collection with company name
-      const personalsCollectionRef = collection(userDocRef, 'Personal');
-      await setDoc(doc(personalsCollectionRef, 'info'), {
-        companyName: companyName,
-      });
-  
-      // Create other collections
-      const collections = ['Products', 'Distribution', 'Inventory', 'Stores', 'Orders', 'Customers', 'Others'];
-      for (const collectionName of collections) {
-        const collectionRef = collection(userDocRef, collectionName);
-        await addDoc(collectionRef, { dummy: true }); // Add a dummy document to create the collection
-      }
-  
-  
-      console.log('Data stored in database');
-      navigate('/home', { state: { email } });
-    } catch (error) {
-      console.error('Error creating account:', error.message);
-    }
+    console.log("Signup clicked")
+if(signup(email,password,companyName)){
+console.log("Signup success");
+navigate('/home/dashboard')
+}else{
+  console.log("Signup error")
+}
+   
   };
 
   return (

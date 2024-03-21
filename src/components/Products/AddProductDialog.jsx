@@ -1,104 +1,116 @@
+// AddProductDialog.js
 import React, { useState } from 'react';
-import './Products.css';
+import './AddProductDialog.css'; // Import CSS file
+import { addProductToDatabase } from '../../Database/Database';
 
-const AddProductDialog = () => {
-  const [showDistributor, setShowDistributor] = useState(false);
-  const [showNewDistributor, setShowNewDistributor] = useState(false);
-  const [distributorName, setDistributorName] = useState('');
-  const [distributorPhone, setDistributorPhone] = useState('');
-  const [distributorComments, setDistributorComments] = useState('');
+const AddProductDialog = ({ onClose }) => {
+  const [productDetails, setProductDetails] = useState({
+    id: '',
+    brand: '',
+    type: '',
+    name: '',
+    description: '',
+    quantity: '',
+    buyPrice: '',
+    sellPrice: '',
+    distributorVisible: false,
+    distributorName: '',
+    distributorPhone: '',
+    profit: '',
+    expiry: ''
+  });
 
-  const handleAddDistributor = () => {
-    setShowDistributor(true);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setProductDetails(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
   };
 
-  const handleNewDistributor = () => {
-    setShowNewDistributor(true);
+  const handleToggleDistributor = () => {
+    setProductDetails(prevState => ({
+      ...prevState,
+      distributorVisible: !prevState.distributorVisible
+    }));
   };
 
-  const handleCloseDistributor = () => {
-    setShowDistributor(false);
+  const handleSave = async () => {
+    try {
+      // Calculate profit and expiry
+      const profit = parseFloat(productDetails.sellPrice) - parseFloat(productDetails.buyPrice);
+      const expiry = new Date(); // Add your logic for calculating expiry date
+      const updatedProductDetails = {
+        ...productDetails,
+        profit: profit.toFixed(2),
+        expiry: expiry
+      };
+  
+      console.log('Adding product to database');
+      const status = await addProductToDatabase(updatedProductDetails); // Wait for the result of addProductToDatabase
+  
+      if (status) {
+        console.log("Product added");
+        onClose();
+      } else {
+        console.log("Product add failed");
+      }
+    } catch (error) {
+      console.error('Error adding product:', error);
+      // Handle error
+    }
   };
+  
 
-  const handleCloseNewDistributor = () => {
-    setShowNewDistributor(false);
-  };
-
-  const handleSaveDistributor = () => {
-    console.log('Distributor Name:', distributorName);
-    console.log('Distributor Phone:', distributorPhone);
-    console.log('Distributor Comments:', distributorComments);
-    setShowNewDistributor(false);
-  };
-
-  const handleAddProduct = () => {
-    // Handle adding product functionality
+  const handleCancel = () => {
+    onClose(); // Close the dialog without saving
   };
 
   return (
-    <div className="add-product-container">
-      <div className="add-product-section">
-        <div className="field-container">
-          <label>ID:</label>
-          <input type="text" />
-        </div>
-        <div className="field-container">
-          <label>Brand:</label>
-          <input type="text" />
-        </div>
-        <div className="field-container">
-          <label>Type:</label>
-          <input type="text" />
-        </div>
-        <div className="field-container">
-          <label>Name:</label>
-          <input type="text" />
-        </div>
-        <div className="field-container">
-          <label>Description:</label>
-          <textarea rows="4"></textarea>
-        </div>
-        <div className="field-container">
-          <label>Qty:</label>
-          <input type="number" />
-        </div>
-        <div className="field-container">
-          <label>By Price:</label>
-          <input type="text" />
-        </div>
-        <div className="field-container">
-          <label>Sell Price:</label>
-          <input type="text" />
-        </div>
-        <div className="field-container">
-          <label>Auto Generate Profit %:</label>
-          <input type="text" />
-        </div>
-        <div className="field-container">
-          <label>Expiry:</label>
-          <input type="date" />
-        </div>
-        <button className="add-distributor-button" onClick={handleAddDistributor}>+ Distributor</button>
-        <button className="add-product-button" onClick={handleAddProduct}>Add Product</button>
+    <div className="add-product-dialog">
+      <div className="dialog-header">
+        <h2 className="dialog-title">Add Product</h2>
+        <button className="close-button" onClick={handleCancel}>X</button>
       </div>
-      {showDistributor && (
-        <div className="distributor-section">
-          <div className="dropdown">
-            <input type="text" placeholder="Search distributor..." />
-            <button className="close-button" onClick={handleCloseDistributor}>X</button>
+      <div className="input-grid">
+        <div className="input-field">
+          <input type="text" name="id" value={productDetails.id} onChange={handleChange} placeholder="ID" />
+          <input type="text" name="brand" value={productDetails.brand} onChange={handleChange} placeholder="Brand" />
+        </div>
+        <div className="input-field">
+          <input type="text" name="type" value={productDetails.type} onChange={handleChange} placeholder="Type" />
+          <input type="text" name="name" value={productDetails.name} onChange={handleChange} placeholder="Name" />
+        </div>
+        <div className="input-field">
+          <textarea rows="4" name="description" value={productDetails.description} onChange={handleChange} placeholder="Description"></textarea>
+        </div>
+        <div className="input-field">
+          <input type="number" name="quantity" value={productDetails.quantity} onChange={handleChange} placeholder="Qty" />
+          <input type="text" name="buyPrice" value={productDetails.buyPrice} onChange={handleChange} placeholder="BP" />
+          <input type="text" name="sellPrice" value={productDetails.sellPrice} onChange={handleChange} placeholder="SP" />
+        </div>
+        <div className="input-field">
+          <input type="text" value={productDetails.profit} readOnly placeholder="Profit" />
+          <input type="text" value={productDetails.expiry} readOnly placeholder="Expiry" />
+        </div>
+      </div>
+      {productDetails.distributorVisible && (
+        <div className="distributor-grid">
+          <div className="input-field">
+            <input type="text" name="distributorName" value={productDetails.distributorName} onChange={handleChange} placeholder="Distributor Name" />
           </div>
-          <button className="new-distributor-button" onClick={handleNewDistributor}>New Distributor</button>
+          <div className="input-field">
+            <input type="text" name="distributorPhone" value={productDetails.distributorPhone} onChange={handleChange} placeholder="Distributor Phone" />
+          </div>
         </div>
       )}
-      {showNewDistributor && (
-        <div className="new-distributor-section">
-          <input type="text" placeholder="Distributor Name" onChange={(e) => setDistributorName(e.target.value)} />
-          <input type="text" placeholder="Distributor Phone" onChange={(e) => setDistributorPhone(e.target.value)} />
-          <textarea placeholder="Comments" rows="4" onChange={(e) => setDistributorComments(e.target.value)}></textarea>
-          <button className="save-distributor-button" onClick={handleSaveDistributor}>Save</button>
-          <button className="close-button" onClick={handleCloseNewDistributor}>X</button>
-        </div>
-      )}
+      <div className="button-container">
+        <button className="distributor-button" onClick={handleToggleDistributor}>
+          {productDetails.distributorVisible ? "Remove Supplier" : "Add Supplier"}
+        </button>
+        <button className="save-button" onClick={handleSave}>Add</button>
+        <button className="cancel-button" onClick={handleCancel}>Cancel</button>
+      </div>
     </div>
   );
 };
