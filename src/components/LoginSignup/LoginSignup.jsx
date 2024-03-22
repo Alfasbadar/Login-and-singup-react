@@ -1,19 +1,30 @@
-import React, { useState } from 'react';
-import { getFirestore, collection, getDocs,getDoc,setDoc,doc } from 'firebase/firestore';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from '../../config/firebase';
+import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import { login,signup } from "../../Database/Database";
+import "./LoginSignup.css";
 
-function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const [branches, setBranches] = useState(0);
+function LoginSignup() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [resetPassword, setResetPassword] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [showCompanyFields, setShowCompanyFields] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleSignupClick = () => {
+    document.querySelector("form.login").style.marginLeft = "-50%";
+    document.querySelector(".title-text .login").style.marginLeft = "-50%";
+  };
+
+  const handleLoginClick = () => {
+    document.querySelector("form.login").style.marginLeft = "0%";
+    document.querySelector(".title-text .login").style.marginLeft = "0%";
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
     setEmailError('');
     setPasswordError('');
 
@@ -26,110 +37,91 @@ function Login() {
       setPasswordError('Password cannot be empty');
       return;
     }
-
-    try {
-      const auth = getAuth();
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log('Login successful!');
-      navigate('/home', { Email:email });
-    } catch (error) {
-      if (error) {
-        console.log('User does not exist. Signup');
-        setShowCompanyFields(true);
-      } else {
-        console.error('Error signing in:', error.message);
-      }
+    if(login(email,password)){
+      console.log("Login success")
+      navigate('/home/dashboard')
     }
+    else{
+      console.log("Login error");
+    }
+
+
   };
 
-
-  const createAccount = async () => {
-    try {
-      const auth = getAuth();
-      await createUserWithEmailAndPassword(auth, email, password);
-      console.log('Account created successfully!');
-  
-      const db = getFirestore();
-      const usersCollection = collection(db, 'users');
-      const userDocRef = doc(usersCollection, email);
-      await setDoc(userDocRef, {
-        companyName: companyName,
-        branches: branches
-      });
-
-      console.log('Data stored in database');
-      getUserByEmail(email).then((user) => {
-        if (user) {
-          console.log('User found:', user);
-          navigate('/home', { state: { user } });
-        } else {
-          console.log('User not found');
-        }
-      });
-      
-    } catch (error) {
-      console.error('Error creating account:', error.message);
-    }
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    console.log("Signup clicked")
+if(signup(email,password,companyName)){
+console.log("Signup success");
+navigate('/home/dashboard')
+}else{
+  console.log("Signup error")
+}
+   
   };
-  
-  const getUserByEmail = async (email) => {
-    try {
-      const db = getFirestore();
-      const usersCollection = collection(db, 'users');
-      const userDocRef = doc(usersCollection, email); // Use the email as the document ID
-      const userDocSnapshot = await getDoc(userDocRef);
-  
-      if (userDocSnapshot.exists()) {
-        return { id: userDocSnapshot.id, ...userDocSnapshot.data() };
-      } else {
-        console.log('User not found');
-        return null;
-      }
-    } catch (error) {
-      console.error('Error fetching user:', error.message);
-      return null;
-    }
-  };
-  
 
-  
-
-  
   return (
-    <div>
-      <input
-        type="text"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email Address"
-      />
-      <div className="error-message">{emailError}</div>
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-      />
-      {showCompanyFields && (
-        <>
-          <input
-            type="text"
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
-            placeholder="Company Name"
-          />
-          <input
-            type="number"
-            value={branches}
-            onChange={(e) => setBranches(e.target.value)}
-            placeholder="Number of Branches"
-          />
-        </>
-      )}
-      <div className="error-message">{passwordError}</div>
-      <button onClick={showCompanyFields ? createAccount : handleLogin}>Go</button>
+    <div className="container">
+      <div className="wrapper">
+        <div className="title-text">
+          <div className="title login">{}</div>
+          <div className="title signup">{}</div>
+        </div>
+        <div className="form-container">
+          <div className="slide-controls">
+            <input type="radio" name="slide" id="login" defaultChecked />
+            <input type="radio" name="slide" id="signup" />
+            <label htmlFor="login" className="slide login" onClick={handleLoginClick}>
+              Login
+            </label>
+            <label htmlFor="signup" className="slide signup" onClick={handleSignupClick}>
+              Signup
+            </label>
+            <div className="slider-tab"></div>
+          </div>
+          <div className="form-inner">
+            <form action="#" className="login" onSubmit={handleLogin}>
+              <div className="field">
+                <input type="text" placeholder="Email Address" required onChange={(e) => setEmail(e.target.value)} />
+                <span className="error">{emailError}</span>
+              </div>
+              <div className="field">
+                <input type="password" placeholder="Password" required onChange={(e) => setPassword(e.target.value)} />
+                <span className="error">{passwordError}</span>
+              </div>
+              <div className="pass-link">
+                <a href="#">Forgot password?</a>
+              </div>
+              <div className="field btn">
+                <div className="btn-layer"></div>
+                <input type="submit" value="Login" />
+              </div>
+            </form>
+            <form action="#" className="signup" onSubmit={handleSignup}>
+              <div className="field">
+                <input type="text" placeholder="Email Address" required onChange={(e) => setEmail(e.target.value)} />
+                <span className="error">{emailError}</span>
+              </div>
+              <div className="field">
+                <input type="password" placeholder="Password" required onChange={(e) => setPassword(e.target.value)} />
+                <span className="error">{passwordError}</span>
+              </div>
+              <div className="field">
+                <input type="password" placeholder="Confirm password" required onChange={(e) => setResetPassword(e.target.value)} />
+              </div>
+              <div className="field">
+                <input type="text" placeholder="Company Name" required onChange={(e) => setCompanyName(e.target.value)} />
+              </div>
+              <div className="field btn">
+                <div className="btn-layer"></div>
+                <input type="submit" value="Signup" />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-export default Login;
+export default LoginSignup;
