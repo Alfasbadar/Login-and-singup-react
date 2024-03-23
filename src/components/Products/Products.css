@@ -1,85 +1,293 @@
-.professional-component {
+.products-container {
   display: flex;
-  justify-content: center;
-  align-items: flex-start; /* Align items to the top */
+  flex-direction: column;
+  align-items: center;
   padding: 20px;
+  flex: 1; /* Allow the products container to fill the remaining space */
 }
-
+/* Search Container */
 .search-container {
   display: flex;
   align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 .search-bar {
-  width: 300px;
+  flex: 1;
   padding: 10px;
-  border-radius: 20px;
-  border: none;
-  outline: none;
-  background-color: #fff;
-  color: #1976d2;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 20px; /* Rounded corners */
+  border: 1px solid #ccc;
+  margin-right: 10px;
+  transition: border-color 0.3s ease; /* Smooth transition for border color */
 }
 
-.search-button {
+.search-bar:focus {
+  border-color: #1976d2; /* Blue border color when focused */
+}
+
+
+.search-button, .add-product-button {
   padding: 10px 20px;
   background-color: #1976d2;
   color: #fff;
   border: none;
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
+  border-radius: 20px; /* Rounded corners */
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease; /* Smooth transition for background color */
 }
 
-.button-container {
+.search-button:hover, .add-product-button:hover {
+  background-color: #155fa0; /* Darker shade on hover */
+}
+/* Total Products */
+.total-products {
+  margin-bottom: 20px;
+}
+
+/* Product List Header */
+.product-list-header {
   display: flex;
   align-items: center;
-  margin-left: 20px;
-  transition: margin-top 0.5s; /* Add transition for smooth animation */
+  justify-content: space-between;
+  padding: 8px; /* Increased padding */
+  background-color: #f0f0f0;
+  width: 100%; /* Set width to 100% */
+  border-radius: 10px; /* Rounded corners */
+  margin-bottom: 30px; /* Increased margin bottom */
 }
 
-.button {
-  padding: 10px 15px;
-  background-color: #fff;
+
+.header-item {
+  flex: 1;
+  text-align: center;
+  font-weight: bold;
   color: #1976d2;
-  border: 1px solid #1976d2;
-  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Product List */
+.product-list {
+  display: contents;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Product Card */
+.product-card {
+  width: 100%; /* Fill the width */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  margin-bottom: 20px; /* Increased margin bottom */
+}
+
+.product-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.product-card > div {
+  flex: 1;
+  text-align: center;
+}
+
+/* AddProductDialog */
+
+.add-product-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.dialog-title {
+  margin: 0;
+  color: #1976d2; /* Blue color */
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.input-grid {
+  display: grid;
+  grid-row-gap: 20px;
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.input-field {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 8px;
+  margin-right: 10px;
+}
+
+input[type="text"], input[type="number"], textarea, select {
+  width: 100%;
+}
+
+.distributor-button, .add-variant-button, .remove-variant-button {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
   margin-right: 10px;
   cursor: pointer;
 }
 
-.button:hover {
-  background-color: #1976d2;
-  color: #fff;
+.add-variant-button, .remove-variant-button {
+  background-color: #dc3545; /* Red color */
 }
 
-.delete-button {
-  background-color: #1976d2;
-  color: #fff;
-}
-
-/* Media query for smaller screens */
-@media only screen and (max-width: 600px) {
-  .professional-component {
-    flex-direction: column; /* Change flex direction to column */
-    align-items: center; /* Align items to the center */
-  }
-
-  .button-container {
-    margin-top: 20px; /* Move button container below the search bar */
-  }
-}
-
-.card-button {
-  padding: 10px;
-  border: 1px solid #ccc;
+.save-button, .cancel-button {
+  padding: 10px 20px;
+  border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  background-color: #28a745; /* Green color */
+  color: #fff;
 }
 
-.card-button.clicked {
-  background-color: #f0f0f0;
-  border-color: #999;
+.cancel-button {
+  background-color: #6c757d; /* Gray color */
+  margin-left: 10px;
+}
+.add-product-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.dialog-title {
+  margin: 0;
+  color: #1976d2; /* Blue color */
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.input-grid {
+  display: grid;
+  grid-row-gap: 20px;
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.input-field {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 8px;
+  margin-right: 10px;
+}
+
+input[type="text"], input[type="number"], textarea, select {
+  width: 100%;
+}
+
+.distributor-button, .add-variant-button, .remove-variant-button {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.add-variant-button, .remove-variant-button {
+  background-color: #dc3545; /* Red color */
+}
+
+.save-button, .cancel-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #28a745; /* Green color */
+  color: #fff;
+}
+
+.cancel-button {
+  background-color: #6c757d; /* Gray color */
+  margin-left: 10px;
+}
+.variant-type-attribute {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.variant-bp-sp-profit {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.variant-row .input-field {
+  margin-right: 5px;
+}
+
+.remove-variant-button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #dc3545; /* Red color */
+  color: #fff;
+  cursor: pointer;
+}
+
+.remove-variant-button:hover {
+  background-color: #c82333; /* Darker shade of red */
+}
+
+.input-field:focus {
+  border-color: #007bff; /* Blue color */
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.sorted-header {
+  color: #1976d2; /* Blue color for sorted header */
+}
+
+.sorted-header-up {
+  color: #1976d2; /* Blue color for sorted header */
+}
+
+.sorted-header-down {
+  color: #1976d2; /* Blue color for sorted header */
 }

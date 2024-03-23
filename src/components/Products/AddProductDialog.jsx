@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './AddProductDialog.css'; // Import CSS file
+import './Products'; // Import CSS file
 import { addProductToDatabase, getUserEmail } from '../../Database/Database'; // Import Firebase functions
 
 const AddProductDialog = ({ onClose }) => {
@@ -83,7 +83,7 @@ const AddProductDialog = ({ onClose }) => {
 
   const handleAddOption = (vIndex) => {
     const updatedVariants = [...productDetails.variants];
-    updatedVariants[vIndex].options.push({ attribute: '', bp: '', sp: '', profit: 0 }); // Add a new option with empty fields
+    updatedVariants[vIndex].options.push({ name: '', bp: '', sp: '', profit: 0 }); // Add a new option with empty fields
     setProductDetails(prevState => ({
       ...prevState,
       variants: updatedVariants
@@ -128,6 +128,7 @@ const AddProductDialog = ({ onClose }) => {
 
     console.log('Adding product to database');
     const status = await addProductToDatabase(productDetails); // Wait for the result of addProductToDatabase
+
     if (status) {
       console.log("Product added");
       onClose();
@@ -140,13 +141,11 @@ const AddProductDialog = ({ onClose }) => {
     onClose(); // Close the dialog without saving
   };
 
-
   return (
     <div className="add-product-dialog">
       <div className="dialog-header">
         <h2 className="dialog-title">Add Product</h2>
-        <button className="close-button" onClick={handleCancel}>X</button>
-      </div>
+              </div>
       <div className="input-grid">
         <div className="input-row">
           <input type="text" name="id" value={productDetails.id} onChange={handleChange} placeholder="ID" className="input-field" />
@@ -216,4 +215,3 @@ const AddProductDialog = ({ onClose }) => {
 };
 
 export default AddProductDialog;
-

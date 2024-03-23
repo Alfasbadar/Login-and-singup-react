@@ -1,11 +1,30 @@
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { firestore } from '../config/firebase'; 
-import { getFirestore, setDoc, addDoc, doc, collection, deleteDoc, getDocs, getDoc } from 'firebase/firestore'; 
+import { firestore } from '../config/firebase'; // Assuming you have initialized Firestore in firebase.js
+import { getFirestore, setDoc, addDoc,getDoc, doc, collection, deleteDoc, getDocs } from 'firebase/firestore'; // Explicitly import getDocs
 
-// Rest of your code...
+const logout = async () => {
+  try {
+    const auth = getAuth();
+    await signOut(auth);
+    return true; // Logout successful
+  } catch (error) {
+    console.error('Error logging out:', error.message);
+    return false; // Logout failed
+  }
+};
+
+const login = async (email, password) => {
+  try {
+    const auth = getAuth();
+    await signInWithEmailAndPassword(auth, email, password);
+    return true; // Login successful
+  } catch (error) {
+    console.error('Error logging in:', error.message);
+    return false; // Login failed
+  }
+};
 
 
-// Function to sign up a new user
 const signup = async (email, password, companyName) => {
   try {
     const auth = getAuth();
@@ -28,32 +47,6 @@ const signup = async (email, password, companyName) => {
     return false; // Signup failed
   }
 };
-
-// Function to log in an existing user
-const login = async (email, password) => {
-  try {
-    const auth = getAuth();
-    await signInWithEmailAndPassword(auth, email, password);
-    return true; // Login successful
-  } catch (error) {
-    console.error('Error logging in:', error.message);
-    return false; // Login failed
-  }
-};
-
-// Function to log out the current user
-const logout = async () => {
-  try {
-    const auth = getAuth();
-    await signOut(auth);
-    return true; // Logout successful
-  } catch (error) {
-    console.error('Error logging out:', error.message);
-    return false; // Logout failed
-  }
-};
-
-// Function to add a new product to Firestore
 const addProductToDatabase = async (productDetails) => {
   try {
     const user = getUserEmail();
@@ -74,25 +67,12 @@ const addProductToDatabase = async (productDetails) => {
     };
 
     const db = getFirestore();
-    const productsCollectionRef = collection(db, 'products');
-
-    // Create a document for the user's products using the user's email as the document ID
-    const userProductsDocRef = doc(productsCollectionRef, user);
-
-    // Check if the user's products document already exists
-    const userProductsDocSnapshot = await getDoc(userProductsDocRef);
-    if (!userProductsDocSnapshot.exists()) {
-      // User's products document doesn't exist, create it
-      await setDoc(userProductsDocRef, {});
-    }
-
-    // Create a subcollection for the user's products
-    const userProductsCollectionRef = collection(userProductsDocRef, 'userProducts');
+    const userProductsCollectionRef = collection(db, 'users', user, 'userProducts');
 
     // Add the product details to the subcollection
-    const productDocRef = await addDoc(userProductsCollectionRef, updatedProductDetails);
+    await addDoc(userProductsCollectionRef, updatedProductDetails);
 
-    console.log('Product added successfully:', productDocRef.id);
+    console.log('Product added successfully');
     return true; // Product added successfully
   } catch (error) {
     console.error('Error adding product to Firestore: ', error);
@@ -101,25 +81,26 @@ const addProductToDatabase = async (productDetails) => {
 };
 
 
-
 // Function to remove a product from Firestore
 const removeProductFromDatabase = async (productId) => {
-  try {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (!user) {
-      console.error('User not authenticated');
-      return false; // User not authenticated
-    }
-
-    // Remove product from Firestore
-    await deleteDoc(doc(collection(firestore, 'products', user.email), productId));
-    console.log('Product removed successfully:', productId);
-    return true; // Product removed successfully
-  } catch (error) {
-    console.error('Error removing product from Firestore: ', error);
-    return false; // Product removal failed
+try {
+  const user = getUserEmail();
+  if (!user) {
+    console.error('User not authenticated');
+    return false; // User not authenticated
   }
+
+  const db = getFirestore();
+  const productDocRef = doc(collection(db, 'users', user, 'userProducts'), productId);
+
+  // Remove product from Firestore
+  await deleteDoc(productDocRef);
+  console.log('Product removed successfully:', productId);
+  return true; // Product removed successfully
+} catch (error) {
+  console.error('Error removing product from Firestore: ', error);
+  return false; // Product removal failed
+}
 };
 
 const getAllProducts = async () => {
@@ -130,12 +111,15 @@ const getAllProducts = async () => {
       return []; // Return empty array if user is not authenticated
     }
 
-    // Retrieve all products from Firestore
-    const querySnapshot = await getDocs(collection(firestore, 'products', user));
+    const db = getFirestore();
+    const userProductsCollectionRef = collection(db, 'products', user, 'userProducts');
+    const querySnapshot = await getDocs(userProductsCollectionRef);
+
     const productsArray = [];
     querySnapshot.forEach((doc) => {
-      productsArray.push(doc.data());
+      productsArray.push({ id: doc.id, ...doc.data() });
     });
+
     console.log('All products retrieved:', productsArray);
     return productsArray;
   } catch (error) {
@@ -143,56 +127,13 @@ const getAllProducts = async () => {
     return []; // Return empty array if there's an error
   }
 };
-// Function to get a product by ID from Firestore
-const getProductById = async (productId) => {
-  try {
-    const user = getUserEmail();
-    if (!user) {
-      console.error('User not authenticated');
-      return null; // Return null if user is not authenticated
-    }
 
-    // Retrieve product by ID from Firestore
-    const docSnapshot = await getDoc(doc(collection(firestore, 'products', user), productId));
-    if (!docSnapshot.exists()) {
-      console.error('Product not found');
-      return null; // Return null if product is not found
-    }
-
-    const productData = docSnapshot.data();
-    console.log('Product retrieved by ID:', productData);
-    return productData;
-  } catch (error) {
-    console.error('Error retrieving product by ID from Firestore: ', error);
-    return null; // Return null if there's an error
-  }
-};
-
-// Function to update a product in Firestore
-const updateProductInDatabase = async (productId, updatedProductDetails) => {
-  try {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (!user) {
-      console.error('User not authenticated');
-      return false; // User not authenticated
-    }
-
-    // Update product in Firestore
-    await setDoc(doc(collection(firestore, 'products', user.email), productId), updatedProductDetails);
-    console.log('Product updated successfully:', updatedProductDetails);
-    return true; // Product updated successfully
-  } catch (error) {
-    console.error('Error updating product in Firestore: ', error);
-    return false; // Product update failed
-  }
-};
 const getUserEmail = () => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    return user ? user.email : null;
-  };
-  
+  const auth = getAuth();
+  const user = auth.currentUser;
+  return user ? user.email : null;
+};
+
 
 export {
   signup,
@@ -201,7 +142,5 @@ export {
   addProductToDatabase,
   removeProductFromDatabase,
   getAllProducts,
-  getProductById,
-  updateProductInDatabase,
   getUserEmail
 };
