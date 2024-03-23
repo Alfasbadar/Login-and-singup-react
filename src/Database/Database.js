@@ -1,6 +1,9 @@
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { firestore } from '../config/firebase'; // Assuming you have initialized Firestore in firebase.js
-import { getFirestore, setDoc, addDoc, doc, collection, deleteDoc } from 'firebase/firestore';
+import { firestore } from '../config/firebase'; 
+import { getFirestore, setDoc, addDoc, doc, collection, deleteDoc, getDocs, getDoc } from 'firebase/firestore'; 
+
+// Rest of your code...
+
 
 // Function to sign up a new user
 const signup = async (email, password, companyName) => {
@@ -52,36 +55,52 @@ const logout = async () => {
 
 // Function to add a new product to Firestore
 const addProductToDatabase = async (productDetails) => {
-    try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-      if (!user) {
-        console.error('User not authenticated');
-        return false; // User not authenticated
-      }
-  
-      // Calculate profit and format expiry date
-      const profit = parseFloat(productDetails.sellPrice) - parseFloat(productDetails.buyPrice);
-      const expiry = productDetails.expiry.replaceAll('/', '-');
-  
-      // Update productDetails with profit and formatted expiry
-      const updatedProductDetails = {
-        ...productDetails,
-        profit: profit.toFixed(2),
-        expiry: expiry
-      };
-  
-      // Add 'products' collection if not present and add product document
-      const productsCollectionRef = firestore.collection('products');
-      await productsCollectionRef.add(updatedProductDetails);
-      console.log('Product added successfully:', updatedProductDetails);
-      return true; // Product added successfully
-    } catch (error) {
-      console.error('Error adding product to Firestore: ', error);
-      return false; // Product addition failed
+  try {
+    const user = getUserEmail();
+    if (!user) {
+      console.error('User not authenticated');
+      return false; // User not authenticated
     }
-  };
-  
+
+    // Calculate profit and format expiry date
+    const profit = parseFloat(productDetails.sp) - parseFloat(productDetails.bp);
+    const expiry = productDetails.expiry.replaceAll('/', '-');
+
+    // Update productDetails with profit and formatted expiry
+    const updatedProductDetails = {
+      ...productDetails,
+      profit: profit.toFixed(2),
+      expiry: expiry
+    };
+
+    const db = getFirestore();
+    const productsCollectionRef = collection(db, 'products');
+
+    // Create a document for the user's products using the user's email as the document ID
+    const userProductsDocRef = doc(productsCollectionRef, user);
+
+    // Check if the user's products document already exists
+    const userProductsDocSnapshot = await getDoc(userProductsDocRef);
+    if (!userProductsDocSnapshot.exists()) {
+      // User's products document doesn't exist, create it
+      await setDoc(userProductsDocRef, {});
+    }
+
+    // Create a subcollection for the user's products
+    const userProductsCollectionRef = collection(userProductsDocRef, 'userProducts');
+
+    // Add the product details to the subcollection
+    const productDocRef = await addDoc(userProductsCollectionRef, updatedProductDetails);
+
+    console.log('Product added successfully:', productDocRef.id);
+    return true; // Product added successfully
+  } catch (error) {
+    console.error('Error adding product to Firestore: ', error);
+    return false; // Product addition failed
+  }
+};
+
+
 
 // Function to remove a product from Firestore
 const removeProductFromDatabase = async (productId) => {
@@ -103,25 +122,20 @@ const removeProductFromDatabase = async (productId) => {
   }
 };
 
-// Function to get all products from Firestore
 const getAllProducts = async () => {
   try {
-    const auth = getAuth();
-    const user = auth.currentUser;
+    const user = getUserEmail();
     if (!user) {
       console.error('User not authenticated');
       return []; // Return empty array if user is not authenticated
     }
 
     // Retrieve all products from Firestore
-    const querySnapshot = await firestore.collection('products').doc(user.email).get();
-    if (!querySnapshot.exists()) {
-      console.error('No products found');
-      return []; // Return empty array if no products found
-    }
-
-    const productsData = querySnapshot.data();
-    const productsArray = Object.values(productsData);
+    const querySnapshot = await getDocs(collection(firestore, 'products', user));
+    const productsArray = [];
+    querySnapshot.forEach((doc) => {
+      productsArray.push(doc.data());
+    });
     console.log('All products retrieved:', productsArray);
     return productsArray;
   } catch (error) {
@@ -129,19 +143,17 @@ const getAllProducts = async () => {
     return []; // Return empty array if there's an error
   }
 };
-
 // Function to get a product by ID from Firestore
 const getProductById = async (productId) => {
   try {
-    const auth = getAuth();
-    const user = auth.currentUser;
+    const user = getUserEmail();
     if (!user) {
       console.error('User not authenticated');
       return null; // Return null if user is not authenticated
     }
 
     // Retrieve product by ID from Firestore
-    const docSnapshot = await firestore.collection('products').doc(user.email).get(productId);
+    const docSnapshot = await getDoc(doc(collection(firestore, 'products', user), productId));
     if (!docSnapshot.exists()) {
       console.error('Product not found');
       return null; // Return null if product is not found
