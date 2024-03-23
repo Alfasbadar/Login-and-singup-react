@@ -1,33 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import './NavBar.css';
+import '../Home/Home.css';
 
 const Navbar = () => {
+  const [navbarVisible, setNavbarVisible] = useState(true);
+
+  const toggleNavbar = () => {
+    setNavbarVisible(!navbarVisible);
+  };
+
   return (
-    <div className="navbar-container">
-      <div className="navbar">
-        <ul>
-          <li>
-            <NavLink to="/home" activeClassName="active">Home</NavLink>
-          </li>
-          <li>
-            <NavLink to="/home/shop" activeClassName="active">Shop</NavLink>
-          </li>
-          <li>
-            <NavLink to="/home/items" activeClassName="active">Items</NavLink>
-          </li>
-          <li>
-            <NavLink to="/home/billing" activeClassName="active">Billing</NavLink>
-          </li>
-          <li>
-            <NavLink to="/home/analytics" activeClassName="active">Analytics</NavLink>
-          </li>
-          <li>
-            <NavLink to="/home/about" activeClassName="active">About</NavLink>
-          </li>
-          <li>
-          </li>
-        </ul>
+    <div className={`navbar-container ${navbarVisible ? 'visible' : 'hidden'}`}>
+      <div className="sidebar">
+        <div className="navbar">
+          <ul>
+            <li>
+              <NavLink to="/home/dashboard" activeClassName="active">Dashboard</NavLink>
+            </li>
+            <li>
+              <NavLink to="/home/distribution" activeClassName="active">Distribution</NavLink>
+            </li>
+            <li>
+              <NavLink to="/home/products" activeClassName="active">Products</NavLink>
+            </li>
+            <li>
+              <NavLink to="/home/inventory" activeClassName="active">Inventory</NavLink>
+            </li>
+            <li>
+              <NavLink to="/home/orders" activeClassName="active">Orders</NavLink>
+            </li>
+            <li>
+              <NavLink to="/home/Stores" activeClassName="active">Stores</NavLink>
+            </li>
+            <li>
+              <NavLink to="/home/customers" activeClassName="active">Customers</NavLink>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   );
