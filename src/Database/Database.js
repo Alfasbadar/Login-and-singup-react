@@ -2,6 +2,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 import { firestore } from '../config/firebase'; // Assuming you have initialized Firestore in firebase.js
 import { getFirestore, setDoc, addDoc,getDoc, doc, collection, deleteDoc, getDocs } from 'firebase/firestore'; // Explicitly import getDocs
 
+//areyouwatchingclosely
 const logout = async () => {
   try {
     const auth = getAuth();
