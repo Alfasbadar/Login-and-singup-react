@@ -1,217 +1,261 @@
-import React, { useState, useEffect } from 'react';
-import './Products'; // Import CSS file
-import { addProductToDatabase, getUserEmail } from '../../Database/Database'; // Import Firebase functions
+import React, { useState } from 'react';
+import './AddProductDialog.css'; // Import CSS file for styling
 
-const AddProductDialog = ({ onClose }) => {
-  const [productDetails, setProductDetails] = useState({
-    id: '',
-    brand: '',
-    type: '',
-    name: '',
-    description: '',
-    quantity: '',
-    unit: 'Nos', // Default unit
-    bp: '', // Buy price
-    sp: '', // Sell price
-    expiry: '',
-    distributorVisible: false,
-    distributorName: '',
-    distributorPhone: '',
-    profit: 0, // Default profit
-    variants: [] // Initialize with an empty array
-  });
+function AddProductDialog() {
+    // Define state variables for input values and variants
+    const [id, setId] = useState('');
+    const [brand, setBrand] = useState('');
+    const [productName, setProductName] = useState('');
+    const [category, setCategory] = useState('');
+    const [quantity, setQuantity] = useState('');
+    const [unit, setUnit] = useState('Nos');
+    const [buyPrice, setBuyPrice] = useState('');
+    const [sellPrice, setSellPrice] = useState('');
+    const [tax, setTax] = useState('');
+    const [distributorName, setDistributorName] = useState('');
+    const [gstNo, setGstNo] = useState('');
+    const [variants, setVariants] = useState([]);
+    const [numOtherOptions, setNumOtherOptions] = useState(0);
+    const [otherOptions, setOtherOptions] = useState([]);
 
-  useEffect(() => {
-    // Fetch user email if not provided
-    const fetchUserEmail = async () => {
-      const userEmail = await getUserEmail();
-      setProductDetails(prevState => ({
-        ...prevState,
-        userEmail: userEmail
-      }));
+    // Function to handle adding a new variant
+    const handleAddVariant = () => {
+        setVariants([...variants, { name: '', variantName: '', options: [{ name: '', quantity: '', unit: '', buyPrice: '', sellPrice: '', tax: '' }] }]);
     };
-    if (!productDetails.userEmail) {
-      fetchUserEmail();
-    }
-  }, [productDetails.userEmail]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'bp' || name === 'sp') {
-      setProductDetails(prevState => ({
-        ...prevState,
-        [name]: value,
-        profit: calculateProfit(value, prevState.sp)
-      }));
-    } else {
-      setProductDetails(prevState => ({
-        ...prevState,
-        [name]: value
-      }));
-    }
-  };
+    // Function to handle removing a variant by index
+    const handleRemoveVariant = (index) => {
+        const updatedVariants = [...variants];
+        updatedVariants.splice(index, 1);
+        setVariants(updatedVariants);
+    };
 
-  const handleToggleDistributor = () => {
-    setProductDetails(prevState => ({
-      ...prevState,
-      distributorVisible: !prevState.distributorVisible
-    }));
-  };
-
-  const handleAddVariant = () => {
-    setProductDetails(prevState => ({
-      ...prevState,
-      variants: [...prevState.variants, { name: '', options: [] }] // Add a new variant with an empty name and options
-    }));
-  };
-
-  const handleRemoveVariant = (index) => {
-    setProductDetails(prevState => ({
-      ...prevState,
-      variants: prevState.variants.filter((_, i) => i !== index)
-    }));
-  };
-
-  const handleVariantNameChange = (index, value) => {
-    const updatedVariants = [...productDetails.variants];
-    updatedVariants[index].name = value;
-    setProductDetails(prevState => ({
-      ...prevState,
-      variants: updatedVariants
-    }));
-  };
-
-  const handleAddOption = (vIndex) => {
-    const updatedVariants = [...productDetails.variants];
-    updatedVariants[vIndex].options.push({ name: '', bp: '', sp: '', profit: 0 }); // Add a new option with empty fields
-    setProductDetails(prevState => ({
-      ...prevState,
-      variants: updatedVariants
-    }));
-  };
-
-  const handleRemoveOption = (vIndex, oIndex) => {
-    const updatedVariants = [...productDetails.variants];
-    updatedVariants[vIndex].options.splice(oIndex, 1); // Remove the selected option
-    setProductDetails(prevState => ({
-      ...prevState,
-      variants: updatedVariants
-    }));
-  };
-
-  const handleOptionChange = (vIndex, oIndex, field, value) => {
-    const updatedVariants = [...productDetails.variants];
-    updatedVariants[vIndex].options[oIndex][field] = value;
-    if (field === 'bp' || field === 'sp') {
-      updatedVariants[vIndex].options[oIndex].profit = calculateProfit(value, updatedVariants[vIndex].options[oIndex].sp);
-    }
-    setProductDetails(prevState => ({
-      ...prevState,
-      variants: updatedVariants
-    }));
-  };
-
-  const calculateProfit = (bp, sp) => {
-    if (!isNaN(bp) && !isNaN(sp)) {
-      return sp - bp;
-    } else {
-      return '';
-    }
-  };
-
-  const handleSave = async () => {
-    // Check if required fields are empty
-    if (!productDetails.id || !productDetails.type || !productDetails.name || !productDetails.description || !productDetails.sp) {
-      alert('Please fill in all required fields: ID, Type, Name, Description, and Selling Price');
-      return;
-    }
-
-    console.log('Adding product to database');
-    const status = await addProductToDatabase(productDetails); // Wait for the result of addProductToDatabase
-
-    if (status) {
-      console.log("Product added");
-      onClose();
-    } else {
-      console.log("Product add failed");
-    }
-  };
-
-  const handleCancel = () => {
-    onClose(); // Close the dialog without saving
-  };
-
-  return (
-    <div className="add-product-dialog">
-      <div className="dialog-header">
-        <h2 className="dialog-title">Add Product</h2>
-              </div>
-      <div className="input-grid">
-        <div className="input-row">
-          <input type="text" name="id" value={productDetails.id} onChange={handleChange} placeholder="ID" className="input-field" />
-          <input type="text" name="brand" value={productDetails.brand} onChange={handleChange} placeholder="Brand" className="input-field" />
-          <input type="text" name="type" value={productDetails.type} onChange={handleChange} placeholder="Type" className="input-field" />
-        </div>
-        <div className="input-row">
-          <input type="text" name="name" value={productDetails.name} onChange={handleChange} placeholder="Name" className="input-field" />
-          <input type="number" name="quantity" value={productDetails.quantity} onChange={handleChange} placeholder="Quantity" className="input-field" />
-          <select name="unit" value={productDetails.unit} onChange={handleChange} className="input-field">
-            <option value="Nos">Nos</option>
-            <option value="kg">kg</option>
-            <option value="gm">gm</option>
-            <option value="cm">cm</option>
-            <option value="m">m</option>
-            <option value="inch">inch</option>
-          </select>
-        </div>
-        <div className="input-row">
-          <input type="text" name="bp" value={productDetails.bp} onChange={handleChange} placeholder="BP" className="input-field" />
-          <input type="text" name="sp" value={productDetails.sp} onChange={handleChange} placeholder="SP" className="input-field" />
-        </div>
-        <div className="input-row">
-          <textarea rows="4" name="description" value={productDetails.description} onChange={handleChange} placeholder="Description" className="input-field"></textarea>
-        </div>
-        <div className="input-row">
-          <input type="text" name="expiry" value={productDetails.expiry} onChange={handleChange} placeholder="Expiry (dd/mm/yyyy)" maxLength="10" className="input-field" />
-        </div>
-        <div className="input-row">
-          <button className="distributor-button" onClick={handleToggleDistributor}>{productDetails.distributorVisible ? "Hide Distributor" : "Show Distributor"}</button>
-        </div>
-        {productDetails.distributorVisible && (
-          <div className="input-row">
-            <input type="text" name="distributorName" value={productDetails.distributorName} onChange={handleChange} placeholder="Distributor Name" className="input-field" />
-            <input type="text" name="distributorPhone" value={productDetails.distributorPhone} onChange={handleChange} placeholder="Distributor Phone" className="input-field" />
-          </div>
-        )}
-        <div className="input-row">
-          <button className="add-variant-button" onClick={handleAddVariant}>+ Variant</button>
-        </div>
-        {productDetails.variants.map((variant, vIndex) => (
-          <div key={vIndex}>
-            <div className="input-row">
-              <input type="text" value={variant.name} onChange={(e) => handleVariantNameChange(vIndex, e.target.value)} placeholder="Variant Name" className="input-field" />
-              <button className="remove-variant-button" onClick={() => handleRemoveVariant(vIndex)}>- Variant</button>
-            </div>
-            {variant.options.map((option, oIndex) => (
-              <div key={oIndex} className="input-row">
-                <input type="text" value={option.attribute} onChange={(e) => handleOptionChange(vIndex, oIndex, 'attribute', e.target.value)} placeholder="Attribute" className="input-field" />
-                <input type="text" value={option.bp} onChange={(e) => handleOptionChange(vIndex, oIndex, 'bp', e.target.value)} placeholder="BP" className="input-field" />
-                <input type="text" value={option.sp} onChange={(e) => handleOptionChange(vIndex, oIndex, 'sp', e.target.value)} placeholder="SP" className="input-field" />
-                <button className="remove-variant-button" onClick={() => handleRemoveOption(vIndex, oIndex)}>-</button>
-              </div>
-            ))}
-            <div className="input-row">
-              <button className="add-variant-button" onClick={() => handleAddOption(vIndex)}>+ Option</button>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="button-container">
-        <button className="save-button" onClick={handleSave}>Add</button>
-        <button className="cancel-button" onClick={handleCancel}>Cancel</button>
-      </div>
-    </div>
-  );
+    // Function to handle other options change
+const handleOtherOptionChange = (index, field, e) => {
+    const updatedOtherOptions = [...otherOptions];
+    updatedOtherOptions[index][field] = e.target.value;
+    setOtherOptions(updatedOtherOptions);
 };
+
+
+    // Function to handle adding a new option for a variant
+    const handleAddOption = (variantIndex) => {
+        const updatedVariants = [...variants];
+        updatedVariants[variantIndex].options.push({ name: '', quantity: '', unit: '', buyPrice: '', sellPrice: '', tax: '' });
+        setVariants(updatedVariants);
+    };
+
+    // Function to handle removing an option for a variant by index
+    const handleRemoveOption = (variantIndex, optionIndex) => {
+        const updatedVariants = [...variants];
+        updatedVariants[variantIndex].options.splice(optionIndex, 1);
+        setVariants(updatedVariants);
+    };
+
+    // Function to handle variant option change
+    const handleOptionChange = (variantIndex, optionIndex, field, value) => {
+        const updatedVariants = [...variants];
+        updatedVariants[variantIndex].options[optionIndex][field] = value;
+        setVariants(updatedVariants);
+    };
+
+    // Function to handle variant name change
+    const handleVariantNameChange = (index, value) => {
+        const updatedVariants = [...variants];
+        updatedVariants[index].variantName = value;
+        setVariants(updatedVariants);
+    };
+
+    // Function to handle form submission
+    const handleSubmit = () => {
+        // Perform form submission logic here
+        console.log('Form submitted:', {
+            id,
+            brand,
+            productName,
+            category,
+            quantity,
+            unit,
+            buyPrice,
+            sellPrice,
+            tax,
+            distributorName,
+            gstNo,
+            variants,
+            otherOptions
+        });
+        // Reset form fields after submission
+        setId('');
+        setBrand('');
+        setProductName('');
+        setCategory('');
+        setQuantity('');
+        setUnit('Nos');
+        setBuyPrice('');
+        setSellPrice('');
+        setTax('');
+        setDistributorName('');
+        setGstNo('');
+        setVariants([]);
+        setOtherOptions([]);
+        setNumOtherOptions(0);
+    };
+
+    return (
+        <div className="product-form card">
+            <h2>Add Product</h2>
+            <div className="form-row">
+                <div className="input-field">
+                    <input type="text" placeholder="Id" value={id} onChange={(e) => setId(e.target.value)} />
+                </div>
+                <div className="input-field">
+                    <input type="text" placeholder="Brand" value={brand} onChange={(e) => setBrand(e.target.value)} />
+                </div>
+                <div className="input-field">
+                    <input type="text" placeholder="Product Name" value={productName} onChange={(e) => setProductName(e.target.value)} />
+                </div>
+            </div>
+            <div className="form-row">
+                <div className="input-field">
+                    <input type="text" placeholder="Category" value={category} onChange={(e) => setCategory(e.target.value)} />
+                </div>
+                <div className="input-field">
+                    <input type="text" placeholder="Quantity"  value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+                </div>
+                <div className="input-field">
+                    <select value={unit} onChange={(e) => setUnit(e.target.value)}>
+                        <option value="Nos">Nos</option>
+                        <option value="Kg">Kg</option>
+                        <option value="gm">gm</option>
+                        <option value="Meter">Meter</option>
+                        <option value="cm">cm</option>
+                    </select>
+                </div>
+            </div>
+            <div className="form-row">
+                <div className="input-field">
+                    <input type="text" placeholder="Buy Price"  value={buyPrice} onChange={(e) => setBuyPrice(e.target.value)} />
+                </div>
+                <div className="input-field">
+                    <input type="text" placeholder="Sell Price" value={sellPrice} onChange={(e) => setSellPrice(e.target.value)} />
+                </div>
+                <div className="input-field">
+                    <input type="number" min="0" max="100" step="0.01" placeholder="Tax (%)" value={tax} onChange={(e)=> setTax(e.target.value)} />
+                </div>
+            </div>
+            <div className="form-row">
+                <div className="input-field">
+                    <input type="text" placeholder="Distributor Name"  value={distributorName} onChange={(e) => setDistributorName(e.target.value)} />
+                </div>
+                <div className="input-field">
+                    <input type="text" placeholder="GST No"  value={gstNo} onChange={(e) => setGstNo(e.target.value)} />
+                </div>
+            </div>
+            <hr />
+            <div className="form-row">
+                <label>Variants</label>
+                <input
+                    type="number"
+                    value={variants.length}
+                    onChange={(e) => {
+                        const numVariants = parseInt(e.target.value, 10);
+                        const updatedVariants = [...variants];
+                        if (numVariants > updatedVariants.length) {
+                            for (let i = updatedVariants.length; i < numVariants; i++) {
+                                updatedVariants.push({
+                                    name: '',
+                                    variantName: '',
+                                    options: [{
+                                        name: '',
+                                        quantity: '',
+                                        unit: '',
+                                        buyPrice: '',
+                                        sellPrice: '',
+                                        tax: ''
+                                    }]
+                                });
+                            }
+                            setVariants(updatedVariants);
+                        } else {
+                            setVariants(updatedVariants.slice(0, numVariants));
+                        }
+                    }}
+                    placeholder="Number of Variants"
+                />
+            </div>
+            <div className="form-row">
+                {variants.map((variant, index) => (
+                    <div className="variant" key={index}>
+                        <div className="variant-header">
+                            <input
+                                type="text"
+                                value={variant.variantName}
+                                onChange={(e) => handleVariantNameChange(index, e.target.value)}
+                                placeholder="Variant Name"
+                            />
+                            <button className="remove-variant-button" onClick={() => handleRemoveVariant(index)}>-</button>
+                        </div>
+                        <div className="variant-options">
+                            {variant.options.map((option, optionIndex) => (
+                                <div className="variant-option" key={optionIndex}>
+                                    <div className="option-row">
+                                        <input
+                                            type="text"
+                                            value={option.name}
+                                            onChange={(e) => handleOptionChange(index, optionIndex, 'name', e.target.value)}
+                                            placeholder="Option Name"
+                                        />
+                                        <input
+                                            type="text"
+                                            value={option.quantity}
+                                            onChange={(e) => handleOptionChange(index, optionIndex, 'quantity', e.target.value)}
+                                            placeholder="Quantity"
+                                        />
+                                                            <select value={unit} onChange={(e) => setUnit(e.target.value)}>
+                        <option value="Nos">Nos</option>
+                        <option value="Kg">Kg</option>
+                        <option value="gm">gm</option>
+                        <option value="Meter">Meter</option>
+                        <option value="cm">cm</option>
+                    </select>
+                                    </div>
+                                    <div className="variant-option-row">
+                                        <input
+                                            type="text"
+                                            value={option.buyPrice}
+                                            onChange={(e) => handleOptionChange(index, optionIndex, 'buyPrice', e.target.value)}
+                                            placeholder="Buy Price"
+                                        />
+                                        <input
+                                            type="text"
+                                            value={option.sellPrice}
+                                            onChange={(e) => handleOptionChange(index, optionIndex, 'sellPrice', e.target.value)}
+                                            placeholder="Sell Price"
+                                        />
+                                        <input
+                                            type="text"
+                                            value={option.tax}
+                                            onChange={(e) => handleOptionChange(index, optionIndex, 'GST No', e.target.value)}
+                                            placeholder="Gst No"
+                                        />
+                                    </div>
+                                    <div className="option-row">
+                                        <button className="option-buttons-plus" onClick={() => handleAddOption(index)}>+</button>
+                                        <button className="option-buttons-minus" onClick={() => handleRemoveOption(index, optionIndex)}>-</button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <div className="form-buttons">
+                <button onClick={handleSubmit} className="btn-add">Add</button>
+                <button onClick={()=> console.log("Cancel clicked")} className="btn-cancel">Cancel</button>
+            </div>
+        </div>
+    );
+
+}
 
 export default AddProductDialog;

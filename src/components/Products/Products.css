@@ -135,8 +135,6 @@
 
 .input-field {
   flex: 1;
-  border: 1px solid #ccc;
-  border-radius: 5px;
   padding: 8px;
   margin-right: 10px;
 }
@@ -151,6 +149,7 @@ input[type="text"], input[type="number"], textarea, select {
   border-radius: 5px;
   background-color: #007bff;
   color: #fff;
+  margin-left: 5px;
   margin-right: 10px;
   cursor: pointer;
 }
@@ -207,16 +206,15 @@ input[type="text"], input[type="number"], textarea, select {
   margin-bottom: 10px;
 }
 
-.input-field {
-  flex: 1;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 8px;
-  margin-right: 10px;
-}
+
 
 input[type="text"], input[type="number"], textarea, select {
   width: 100%;
+  padding: 8px;
+  border-style: outset; /* Remove border */
+  border-radius: 5px;
+  border-color: #6e6e6e9e;
+  outline: none;
 }
 
 .distributor-button, .add-variant-button, .remove-variant-button {

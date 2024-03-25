@@ -1,0 +1,172 @@
+.product-form {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 400px;     padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+    .product-form h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+    }
+
+    .input-field {
+        flex: 1;
+        margin-right: 15px;
+    }
+
+    .input-field label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .input-field input,
+    .input-field select,.text-input-field {
+        width: 100%;
+        padding: 8px;
+    }
+
+    .input-field select {
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18px" height="18px"><path d="M7 10l5 5 5-5H7z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+    }
+
+    .input-field select::-ms-expand {
+        display: none;
+    }
+
+    .input-field input[type="number"] {
+        appearance: textfield;
+        margin-bottom: 10px;
+    }
+
+    .input-field:last-child {
+        margin-right: 0;
+    }
+
+    .variant {
+        margin-bottom: 20px;
+    }
+
+    .variant-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .variant-header label {
+        color: #333;
+    }
+
+    .variant-options {
+        border: 1px solid #000000;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    .option-header {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #ccc;
+        margin-bottom: 5px;
+    }
+
+    .option-header label {
+        flex: 1;
+        color: #333;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .variant-option {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+    .variant-option input[type="text"] {
+        flex: 1;
+        margin-bottom: 5px  ;
+    }
+
+    .add-remove-buttons {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .add-remove-buttons button,
+    .btn-add {
+        margin-top: 5px;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        scale: 1.3;
+        margin-right: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .btn-cancel{
+        margin-top: 5px;
+        padding: 5px 10px;
+        background-color: #fbfbfb;
+        color: #ff0000;
+        margin-left: 5px;
+        border-color: #ff0000;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .add-remove-buttons button:hover {
+        background-color: #0056b3;
+    }
+
+    .add-remove-buttons button:last-child {
+        margin-top: 10px;
+    }
+
+    /* Styles for Other Options */
+    .other-options-container {
+        margin-bottom: 20px;
+    }
+
+    .other-option {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .other-option input[type="text"] {
+        flex: 1;
+        margin-right: 10px;
+    }
+
+    .other-option button {
+        margin-left: 10px;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .other-option button:hover {
+        background-color: #0056b3;
+    }
+
