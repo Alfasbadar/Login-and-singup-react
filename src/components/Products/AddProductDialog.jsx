@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './AddProductDialog.css'; // Import CSS file for styling
+import './Products.css'; // Import CSS file for styling
 
 function AddProductDialog() {
     // Define state variables for input values and variants
@@ -9,6 +9,7 @@ function AddProductDialog() {
     const [category, setCategory] = useState('');
     const [quantity, setQuantity] = useState('');
     const [unit, setUnit] = useState('Nos');
+    const [description,setDescription] = useState('')
     const [buyPrice, setBuyPrice] = useState('');
     const [sellPrice, setSellPrice] = useState('');
     const [tax, setTax] = useState('');
@@ -74,6 +75,7 @@ const handleOtherOptionChange = (index, field, e) => {
             brand,
             productName,
             category,
+            description,
             quantity,
             unit,
             buyPrice,
@@ -89,6 +91,7 @@ const handleOtherOptionChange = (index, field, e) => {
         setBrand('');
         setProductName('');
         setCategory('');
+        setDescription('');
         setQuantity('');
         setUnit('Nos');
         setBuyPrice('');
@@ -105,8 +108,8 @@ const handleOtherOptionChange = (index, field, e) => {
         <div className="product-form card">
             <h2>Add Product</h2>
             <div className="form-row">
-                <div className="input-field">
-                    <input type="text" placeholder="Id" value={id} onChange={(e) => setId(e.target.value)} />
+            <div className="input-field">
+                    <input type="text" placeholder="ID" value={id} onChange={(e) => setId(e.target.value)} />
                 </div>
                 <div className="input-field">
                     <input type="text" placeholder="Brand" value={brand} onChange={(e) => setBrand(e.target.value)} />
@@ -134,6 +137,11 @@ const handleOtherOptionChange = (index, field, e) => {
             </div>
             <div className="form-row">
                 <div className="input-field">
+                <input type="text-area" placeholder='Description' value={description} onChange={(e) =>setDescription(e.target.value)}/>
+                </div>
+            </div>
+            <div className="form-row">
+                <div className="input-field">
                     <input type="text" placeholder="Buy Price"  value={buyPrice} onChange={(e) => setBuyPrice(e.target.value)} />
                 </div>
                 <div className="input-field">
@@ -152,8 +160,8 @@ const handleOtherOptionChange = (index, field, e) => {
                 </div>
             </div>
             <hr />
-            <div className="form-row">
-                <label>Variants</label>
+            <div className="variant-form-row">
+                <label>Variants and Options</label>
                 <input
                     type="number"
                     value={variants.length}
@@ -183,21 +191,23 @@ const handleOtherOptionChange = (index, field, e) => {
                     placeholder="Number of Variants"
                 />
             </div>
-            <div className="form-row">
+            <div className="-variant-form-row">
                 {variants.map((variant, index) => (
                     <div className="variant" key={index}>
                         <div className="variant-header">
+    
                             <input
                                 type="text"
                                 value={variant.variantName}
                                 onChange={(e) => handleVariantNameChange(index, e.target.value)}
                                 placeholder="Variant Name"
                             />
-                            <button className="remove-variant-button" onClick={() => handleRemoveVariant(index)}>-</button>
+                            <button className="remove-variant-button" onClick={() => handleRemoveVariant(index)}>Remove</button>
                         </div>
                         <div className="variant-options">
                             {variant.options.map((option, optionIndex) => (
-                                <div className="variant-option" key={optionIndex}>
+                            <div className="variant-option" key={optionIndex}>
+                                <div className="variant-option-input-container">
                                     <div className="option-row">
                                         <input
                                             type="text"
@@ -218,34 +228,43 @@ const handleOtherOptionChange = (index, field, e) => {
                         <option value="Meter">Meter</option>
                         <option value="cm">cm</option>
                     </select>
+                    
+                 </div>
+                                        <button className="option-add-button" onClick={() => handleRemoveOption(index, optionIndex)}>-</button>
                                     </div>
-                                    <div className="variant-option-row">
+                                    <div className="variant-options ">
+                                <div className="variant-option-input-container">
+                                    <div className="option-row">
+
+
                                         <input
                                             type="text"
                                             value={option.buyPrice}
                                             onChange={(e) => handleOptionChange(index, optionIndex, 'buyPrice', e.target.value)}
                                             placeholder="Buy Price"
-                                        />
+                                            />
                                         <input
                                             type="text"
                                             value={option.sellPrice}
                                             onChange={(e) => handleOptionChange(index, optionIndex, 'sellPrice', e.target.value)}
                                             placeholder="Sell Price"
-                                        />
+                                            />
                                         <input
                                             type="text"
                                             value={option.tax}
                                             onChange={(e) => handleOptionChange(index, optionIndex, 'GST No', e.target.value)}
                                             placeholder="Gst No"
-                                        />
+                                            />
+                                            </div>
                                     </div>
+                                            </div>
                                     <div className="option-row">
-                                        <button className="option-buttons-plus" onClick={() => handleAddOption(index)}>+</button>
-                                        <button className="option-buttons-minus" onClick={() => handleRemoveOption(index, optionIndex)}>-</button>
                                     </div>
                                 </div>
                             ))}
                         </div>
+                        <button className="option-buttons-remove-button" onClick={() => handleAddOption(index)}>+ fields</button>
+                        <hr/>
                     </div>
                 ))}
             </div>
@@ -255,7 +274,7 @@ const handleOtherOptionChange = (index, field, e) => {
             </div>
         </div>
     );
-
+    
 }
 
 export default AddProductDialog;
