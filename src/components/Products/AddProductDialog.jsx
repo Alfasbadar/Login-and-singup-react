@@ -18,6 +18,7 @@ function AddProductDialog() {
     const [variants, setVariants] = useState([]);
     const [numOtherOptions, setNumOtherOptions] = useState(0);
     const [otherOptions, setOtherOptions] = useState([]);
+    const [showCard, setShowCard] = useState(true);
 
     // Function to handle adding a new variant
     const handleAddVariant = () => {
@@ -60,6 +61,10 @@ const handleOtherOptionChange = (index, field, e) => {
         setVariants(updatedVariants);
     };
 
+    const handleCancel = () => {
+setShowCard(false);
+    };
+
     // Function to handle variant name change
     const handleVariantNameChange = (index, value) => {
         const updatedVariants = [...variants];
@@ -70,7 +75,7 @@ const handleOtherOptionChange = (index, field, e) => {
     // Function to handle form submission
     const handleSubmit = () => {
         // Perform form submission logic here
-        console.log('Form submitted:', {
+        const product= {
             id,
             brand,
             productName,
@@ -85,19 +90,25 @@ const handleOtherOptionChange = (index, field, e) => {
             gstNo,
             variants,
             otherOptions
-        });
+        };
+
+        console.log(product)
         // Reset form fields after submission
-        setId('');
-        setBrand('');
+        var idno=id;
+        console.log(idno)
+        idno=idno+1
+        setId(idno);
+        console.log(idno);
+        // setBrand('');
         setProductName('');
-        setCategory('');
+        // setCategory('');
         setDescription('');
-        setQuantity('');
-        setUnit('Nos');
-        setBuyPrice('');
-        setSellPrice('');
-        setTax('');
-        setDistributorName('');
+        // setQuantity('');
+        // setUnit('Nos');
+        // setBuyPrice('');
+        // setSellPrice('');
+        // setTax('');
+        // setDistributorName('');
         setGstNo('');
         setVariants([]);
         setOtherOptions([]);
@@ -251,7 +262,7 @@ const handleOtherOptionChange = (index, field, e) => {
                                             />
                                         <input
                                             type="text"
-                                            value={option.tax}
+                                            value={option.gstNo}
                                             onChange={(e) => handleOptionChange(index, optionIndex, 'GST No', e.target.value)}
                                             placeholder="Gst No"
                                             />
@@ -270,7 +281,7 @@ const handleOtherOptionChange = (index, field, e) => {
             </div>
             <div className="form-buttons">
                 <button onClick={handleSubmit} className="btn-add">Add</button>
-                <button onClick={()=> console.log("Cancel clicked")} className="btn-cancel">Cancel</button>
+                <button onClick={handleCancel} className="btn-cancel">Cancel</button>
             </div>
         </div>
     );
