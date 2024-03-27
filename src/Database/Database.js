@@ -113,7 +113,7 @@ const getAllProducts = async () => {
     }
 
     const db = getFirestore();
-    const userProductsCollectionRef = collection(db, 'products', user, 'userProducts');
+    const userProductsCollectionRef = collection(db, 'users', user, 'userProducts');
     const querySnapshot = await getDocs(userProductsCollectionRef);
 
     const productsArray = [];

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Products.css'; // Import CSS file for styling
+import {addProductToDatabase} from '../../Database/Database'
 
 function AddProductDialog() {
     // Define state variables for input values and variants
@@ -62,7 +63,7 @@ const handleOtherOptionChange = (index, field, e) => {
     };
 
     const handleCancel = () => {
-setShowCard(false);
+        return
     };
 
     // Function to handle variant name change
@@ -92,9 +93,14 @@ setShowCard(false);
             otherOptions
         };
 
+        if(addProductToDatabase(product))
+        console.log("Product added to database")
+        else  
+        console.error("Error adding product to database");
+
         console.log(product)
         // Reset form fields after submission
-        var idno=id;
+        var idno= parseInt(id)
         console.log(idno)
         idno=idno+1
         setId(idno);
@@ -109,10 +115,10 @@ setShowCard(false);
         // setSellPrice('');
         // setTax('');
         // setDistributorName('');
-        setGstNo('');
-        setVariants([]);
-        setOtherOptions([]);
-        setNumOtherOptions(0);
+        // setGstNo('');
+        // setVariants([]);
+        // setOtherOptions([]);
+        // setNumOtherOptions(0);
     };
 
     return (

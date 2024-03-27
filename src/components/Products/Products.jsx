@@ -100,7 +100,7 @@ const Products = () => {
           Search
         </button>
         <button className="add-product-button" onClick={handleAdd}>
-          + Add Product
+          + Products
         </button>
       </div>
       <div className="total-products">Total Products: {products.length}</div>

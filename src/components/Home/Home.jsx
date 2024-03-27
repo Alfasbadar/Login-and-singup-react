@@ -28,7 +28,7 @@ const Home = ({ user }) => {
   return (
     <div className="home-container">
       <div className="action-bar">
-        <div className="company-name">Company Name</div>
+        <div className="company-name">Stockdash</div>
         <div className="action-buttons">
           <div className="profile-button">Profile</div>
           <div className="logout-button" onClick={handleLogoutClick}>Logout</div>
