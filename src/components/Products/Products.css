@@ -3,9 +3,9 @@
   width: 100%;
   max-width: 600px;
   padding: 2rem;
-  background-color: white;
-  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
-  border-radius: 5px;
+  background-color: rgb(255, 255, 255);
+  box-shadow: rgba(255, 255, 255, 0.15) 1.95px 1.95px 2.6px;
+  border-radius: 20px;
   margin: 0 auto;
   margin-top: 50px;
 }
