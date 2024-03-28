@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import './Products.css';
 import AddProductDialog from './AddProductDialog';
-import { getAllProducts } from '../../Database/Database';
+import { getAllProducts ,removeProductFromDatabase} from '../../Database/Database';
+import { useResolvedPath } from 'react-router-dom';
 
 const Products = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditOpen, setEditOpen] = useState(false);
   const [products, setProducts] = useState([]);
+  const [productToEdit,setProductToEdit] = useState(null)
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState('id'); // Default sort field
   const [sortDirection, setSortDirection] = useState('asc'); // Default sort direction
-
+  
   useEffect(() => {
-    // Fetch products data when component mounts
     fetchProducts();
   }, []);
 
@@ -20,6 +22,7 @@ const Products = () => {
       // Fetch products data from Firestore
       const productsData = await getAllProducts();
       setProducts(productsData);
+      console.log("Applied Products data")
     } catch (error) {
       console.error('Error fetching products:', error);
     }
@@ -31,6 +34,8 @@ const Products = () => {
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
+    setEditOpen(false);
+    fetchProducts();  
   };
 
   const handleSearchChange = (e) => {
@@ -53,6 +58,18 @@ const Products = () => {
     }
   };
 
+  const handleDelete = (productId) => {
+    if(removeProductFromDatabase(productId)){
+      console.log("Removed ")
+      fetchProducts()
+    }
+    else{
+      console.log("Error in removing")
+    }
+    };
+  const updateView = () => {
+    fetchProducts();
+  }
   // Function to compare objects based on field for sorting
   const compareValues = (key, order = 'asc') => {
     return function(a, b) {
@@ -85,7 +102,19 @@ const Products = () => {
     }
     return '';
   };
-
+  const handleEdit = (id) => {
+    // Find the product with the matching id
+    const selectedProduct = products.find(product => product.id === id);
+  
+    if (selectedProduct) {
+      console.log("Selected product:", selectedProduct);
+      setProductToEdit(selectedProduct);
+      setEditOpen(true);
+    } else {
+      console.log("Product not found with id:", id);
+    }
+  }
+  
   return (
     <div className="products-container">
       <div className="search-container">
@@ -100,7 +129,7 @@ const Products = () => {
           Search
         </button>
         <button className="add-product-button" onClick={handleAdd}>
-          + Products
+          + Add Product
         </button>
       </div>
       <div className="total-products">Total Products: {products.length}</div>
@@ -117,11 +146,11 @@ const Products = () => {
         <div className={`header-item ${getSortedHeaderClass('quantity')}`} onClick={() => handleSort('quantity')}>
           Quantity {sortField === 'quantity' && (sortDirection === 'asc' ? '↓' : '↑')}
         </div>
-        <div className={`header-item ${getSortedHeaderClass('price')}`} onClick={() => handleSort('price')}>
+        <div className={`header-item ${getSortedHeaderClass('price')}`} onClick={() => handleSort('sellPrice')}>
           <b>Price</b> {sortField === 'price' && (sortDirection === 'asc' ? '↓' : '↑')}
         </div>
         <div className={`header-item ${getSortedHeaderClass('distributorName')}`} onClick={() => handleSort('distributorName')}>
-          Distributor Name {sortField === 'distributorName' && (sortDirection === 'asc' ? '↓' : '↑')}
+          Distributor {sortField === 'distributorName' && (sortDirection === 'asc' ? '↓' : '↑')}
         </div>
       </div>
       <div className="product-list">
@@ -129,16 +158,20 @@ const Products = () => {
           <div className="product-card" key={product.id}>
             <div>{product.id}</div>
             <div>{product.brand}</div>
-            <div>{product.name}</div>
+            <div>{product.productName}</div>
             <div>{product.quantity}</div>
-            <div>{product.price}</div>
+            <div>{product.sellPrice}</div>
             <div>{product.distributorName}</div>
+            <button className="remove-product-button" onClick={() => handleDelete(product.id)}>Delete</button>
+            <button className="edit-product-button" onClick={() => handleEdit(product.id)}>Edit</button>
+
           </div>
         ))}
       </div>
-      {isDialogOpen && <AddProductDialog onClose={handleCloseDialog} />}
+      {isDialogOpen && <AddProductDialog onClose={handleCloseDialog} onChange={updateView} />}
+      {isEditOpen && <AddProductDialog onClose={handleCloseDialog} onChange={updateView} product={productToEdit} />}
+
     </div>
   );
 };
-
 export default Products;

@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import './Products.css'; // Import CSS file for styling
 import {addProductToDatabase} from '../../Database/Database'
 
-function AddProductDialog() {
-    // Define state variables for input values and variants
+function AddProductDialog({onClose,onChange,product}) {
+console.log(product)
+const [AddProduct, isAddProduct] = useState(null)
+
     const [id, setId] = useState('');
     const [brand, setBrand] = useState('');
     const [productName, setProductName] = useState('');
@@ -20,7 +22,37 @@ function AddProductDialog() {
     const [numOtherOptions, setNumOtherOptions] = useState(0);
     const [otherOptions, setOtherOptions] = useState([]);
     const [showCard, setShowCard] = useState(true);
+    const [heading,setHeading] = useState("Add Product");
+    const [buttonText, setButtonText] = useState("Add")
 
+    useEffect(() => {
+        if (product !== null && product) {
+            setHeading("Edit Product");
+            setButtonText("Edit")
+            console.log("Props contain Value which means that the component is using to edit a product")
+            // Load values of the product to their appropriate fields
+            isAddProduct(false);
+            setId(product.id);
+            setBrand(product.brand);
+            setProductName(product.productName);
+            setCategory(product.category);
+            setQuantity(product.quantity);
+            setUnit(product.unit);
+            setDescription(product.description); // Corrected: Use dot instead of comma
+            setBuyPrice(product.buyPrice); // Corrected: Use dot instead of comma
+            setSellPrice(product.sellPrice);
+            setTax(product.tax);
+            setDistributorName(product.distributorName);
+            setGstNo(product.gstNo);
+            setVariants(product.variants);
+            setOtherOptions(product.otherOptions);
+        }
+        else{
+            console.log("Adding Product ")
+
+        }
+    }, [product]);
+    
     // Function to handle adding a new variant
     const handleAddVariant = () => {
         setVariants([...variants, { name: '', variantName: '', options: [{ name: '', quantity: '', unit: '', buyPrice: '', sellPrice: '', tax: '' }] }]);
@@ -63,7 +95,13 @@ const handleOtherOptionChange = (index, field, e) => {
     };
 
     const handleCancel = () => {
-        return
+        try {
+            onClose();
+            onChange();
+        } catch (error) {
+            onChange();
+        }
+
     };
 
     // Function to handle variant name change
@@ -98,17 +136,13 @@ const handleOtherOptionChange = (index, field, e) => {
         else  
         console.error("Error adding product to database");
 
+        onChange();
         console.log(product)
-        // Reset form fields after submission
-        var idno= parseInt(id)
-        console.log(idno)
-        idno=idno+1
-        setId(idno);
-        console.log(idno);
+        // setId(id++);
         // setBrand('');
-        setProductName('');
+        // setProductName('');
         // setCategory('');
-        setDescription('');
+        // setDescription('');
         // setQuantity('');
         // setUnit('Nos');
         // setBuyPrice('');
@@ -123,7 +157,7 @@ const handleOtherOptionChange = (index, field, e) => {
 
     return (
         <div className="product-form card">
-            <h2>Add Product</h2>
+            <h2>{heading}</h2>
             <div className="form-row">
             <div className="input-field">
                     <input type="text" placeholder="ID" value={id} onChange={(e) => setId(e.target.value)} />
@@ -286,7 +320,7 @@ const handleOtherOptionChange = (index, field, e) => {
                 ))}
             </div>
             <div className="form-buttons">
-                <button onClick={handleSubmit} className="btn-add">Add</button>
+                <button onClick={handleSubmit} className="btn-add">{buttonText}</button>
                 <button onClick={handleCancel} className="btn-cancel">Cancel</button>
             </div>
         </div>
