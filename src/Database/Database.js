@@ -90,32 +90,6 @@ try {
   return false; // Product removal failed
 }
 };
-
-// const getAllProducts = async () => {
-//   try {
-//     const user = getUserEmail();
-//     if (!user) {
-//       console.error('User not authenticated');
-//       return []; // Return empty array if user is not authenticated
-//     }
-
-//     const db = getFirestore();
-//     const userProductsCollectionRef = collection(db, 'products', user, 'userProducts');
-//     const querySnapshot = await getDocs(userProductsCollectionRef);
-//     console.log(querySnapshot)
-//     const productsArray = [];
-//     querySnapshot.forEach((doc) => {
-//       productsArray.push({ id: doc.id, ...doc.data() });
-//     });
-
-//     console.log('All products retrieved:', productsArray);
-//     return productsArray;
-//   } catch (error) {
-//     console.error('Error retrieving products from Firestore: ', error);
-//     return []; // Return empty array if there's an error
-//   }
-// };
-
 const getAllProducts = async () => {
   try {
     const user = getUserEmail();
@@ -123,7 +97,7 @@ const getAllProducts = async () => {
       console.error('User not authenticated');
       return []; // Return empty array if user is not authenticated
     }
-
+    
     const db = getFirestore();
     const userProductsCollectionRef = collection(db, 'products', user, 'userProducts');
     const querySnapshot = await getDocs(userProductsCollectionRef);
@@ -132,7 +106,7 @@ const getAllProducts = async () => {
     querySnapshot.forEach((doc) => {
       productsArray.push({ id: doc.id, ...doc.data() });
     });
-
+    
     console.log('All products retrieved:', productsArray);
     return productsArray;
   } catch (error) {
@@ -140,6 +114,22 @@ const getAllProducts = async () => {
     return []; // Return empty array if there's an error
   }
 };
+
+const editProducts = (product) => {
+console.log("Showing Product in edit Product" ,product.id)
+if(removeProductFromDatabase(product.id)){
+  console.log(">Removed")
+  if(addProductToDatabase(product)){
+    console.log("Product updated")
+  }else{
+    console.log("Failed to edit Product")
+  }
+}
+else{
+  console.log("Failed to remove")
+}
+};
+
 
 
 const getUserEmail = () => {
@@ -156,5 +146,6 @@ export {
   addProductToDatabase,
   removeProductFromDatabase,
   getAllProducts,
+  editProducts,
   getUserEmail
 };

@@ -1,6 +1,7 @@
+
 import React, { useState,useEffect } from 'react';
 import './Products.css'; // Import CSS file for styling
-import {addProductToDatabase} from '../../Database/Database'
+import {addProductToDatabase,editProducts} from '../../Database/Database'
 
 function AddProductDialog({onClose,onChange,product}) {
 console.log(product)
@@ -113,47 +114,56 @@ const handleOtherOptionChange = (index, field, e) => {
 
     // Function to handle form submission
     const handleSubmit = () => {
-        // Perform form submission logic here
-        const product= {
-            id,
-            brand,
-            productName,
-            category,
-            description,
-            quantity,
-            unit,
-            buyPrice,
-            sellPrice,
-            tax,
-            distributorName,
-            gstNo,
-            variants,
-            otherOptions
-        };
+      const product= {
+          id,
+          brand,
+          productName,
+          category,
+          description,
+          quantity,
+          unit,
+          buyPrice,
+          sellPrice,
+          tax,
+          distributorName,
+          gstNo,
+          variants,
+          otherOptions
+      };
+        if(buttonText=="Edit"){
+            editProducts(product);
+            console.log("edit")
+            onClose();
 
-        if(addProductToDatabase(product))
-        console.log("Product added to database")
+        }else{
+            console.log("add")
+
+            // Perform form submission logic here
+            
+            if(addProductToDatabase(product))
+            console.log("Product added to database")
         else  
         console.error("Error adding product to database");
-
-        onChange();
-        console.log(product)
-        // setId(id++);
-        // setBrand('');
-        // setProductName('');
-        // setCategory('');
-        // setDescription('');
-        // setQuantity('');
-        // setUnit('Nos');
-        // setBuyPrice('');
-        // setSellPrice('');
-        // setTax('');
-        // setDistributorName('');
-        // setGstNo('');
-        // setVariants([]);
-        // setOtherOptions([]);
+    
+    onChange();
+    console.log(product)
+    // setId(id++);
+    // setBrand('');
+    // setProductName('');
+    // setCategory('');
+    // setDescription('');
+    // setQuantity('');
+    // setUnit('Nos');
+    // setBuyPrice('');
+    // setSellPrice('');
+    // setTax('');
+    // setDistributorName('');
+    // setGstNo('');
+    // setVariants([]);
+    // setOtherOptions([]);
         // setNumOtherOptions(0);
     };
+}
 
     return (
         <div className="product-form card">
