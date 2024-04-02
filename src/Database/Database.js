@@ -68,6 +68,25 @@ const addProductToDatabase = async (productDetails) => {
 };
 
 
+const addInventoryToDatabase = async (inventoryDetails) => {
+  try {
+    const user = getUserEmail();
+    console.log("Authenticating user to add Inventory")
+    if (!user) {
+      console.error('User not authenticated');
+      return false; // User not authenticated
+    }
+    const db = getFirestore();
+    const userProductsCollectionRef = collection(db, 'inventory', user, 'userInventory');
+    const productDocRef = doc(userProductsCollectionRef, inventoryDetails.id);
+    await setDoc(productDocRef, inventoryDetails);
+    return true;
+  } catch (error) {
+    console.error('Error adding inventory to Firestore: ');
+    return false; // Product addition failed
+  }
+};
+
 
 // Function to remove a product from Firestore
 const removeProductFromDatabase = async (productId) => {
@@ -114,7 +133,30 @@ const getAllProducts = async () => {
     return []; // Return empty array if there's an error
   }
 };
-
+const getAllInventory = async () => {
+  try {
+    const user = getUserEmail();
+    if (!user) {
+      console.error('User not authenticated');
+      return []; // Return empty array if user is not authenticated
+    }
+    
+    const db = getFirestore();
+    const userInventoryCollectionRef = collection(db, 'inventory', user, 'userInventory');
+    const querySnapshot = await getDocs(userInventoryCollectionRef);
+    console.log(querySnapshot)
+    const inventoryArray = [];
+    querySnapshot.forEach((doc) => {
+      inventoryArray.push({ id: doc.id, ...doc.data() });
+    });
+    
+    console.log('All inventory retrieved:', inventoryArray);
+    return inventoryArray;
+  } catch (error) {
+    console.error('Error retrieving inventory from Firestore: ', error);
+    return []; // Return empty array if there's an error
+  }
+};
 const editProducts = (product) => {
 console.log("Showing Product in edit Product" ,product.id)
 if(removeProductFromDatabase(product.id)){
@@ -147,5 +189,7 @@ export {
   removeProductFromDatabase,
   getAllProducts,
   editProducts,
-  getUserEmail
+  getUserEmail,
+  addInventoryToDatabase,
+  getAllInventory
 };
