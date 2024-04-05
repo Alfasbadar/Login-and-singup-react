@@ -96,6 +96,7 @@
   padding: 0.5rem;
   text-align: left;
   border-radius: 20px;
+  max-width: 100%;
   margin-bottom: 1rem;
 }
 .product-card:hover {

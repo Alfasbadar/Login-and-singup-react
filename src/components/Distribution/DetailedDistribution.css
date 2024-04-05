@@ -1,0 +1,161 @@
+.detailed-distribution-container {
+    padding: 20px;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .back-button,
+  .add-bill-button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .back-button {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .add-bill-button {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  .distributor-info {
+    text-align: right;
+  }
+  
+  .bills {
+    display: contents;
+    flex-wrap: wrap;
+  }
+  
+  .add-bill {
+    margin-bottom: 20px;
+  }
+  
+  .add-bill-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  
+  .input {
+    padding: 8px;
+    margin-right: 10px;
+  }
+  
+  .button-container {
+    margin-top: 10px;
+    text-align: right;
+  }
+  
+  .add-button,
+  .cancel-button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .add-button {
+    background-color: #007bff;
+    color: #fff;
+    margin-right: 10px;
+  }
+  
+  .cancel-button {
+    background-color: #dc3545;
+    color: #fff;
+  }
+  
+  .bill-card {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .bill-card.expanded {
+    height: auto;
+  }
+  
+  .bill-header {
+    display: flex;
+  }
+  
+  .bill-header p {
+    flex: 1;
+  }
+  
+  .modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  
+  .modal-content {
+    background-color: #fefefe;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+  }
+  
+  .product-input {
+    margin-bottom: 10px;
+  }
+  
+  .add-product-button {
+    margin-bottom: 10px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #f2f2f2;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  

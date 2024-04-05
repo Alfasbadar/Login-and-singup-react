@@ -1,115 +1,127 @@
-.inventory-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* styles.css */
+
+.cool-component {
+  margin: 20px;
   padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
 }
 
 .search-bar {
-  display: flex;
   margin-bottom: 20px;
+  display: flex;
 }
 
 .search-bar input {
+  flex: 1;
   padding: 8px;
   border: 1px solid #ccc;
-  border-radius: 25px;
-  min-width: 100px;
-}
-
-.search-button,
-.add-inventory-button {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 25px;
-  cursor: pointer;
-  margin-left: 10px;
-}
-
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.popup-content {
-  background-color: #fff;
-  padding: 40px;
-  border-radius: 35px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
-  width: 100%;
-}
-
-h2 {
-  margin-bottom: 10px;
-}
-
-.popup-content input {
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 8px;
-  margin-top: px;
-  border: 1px solid #ccc;
-  border-radius: 15px;
-}
-
-.popup-content button {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 15px;
-  cursor: pointer;
+  border-radius: 5px;
   margin-right: 10px;
 }
 
+.search-bar button {
+  padding: 8px 15px;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+
+.add-inventory-button {
+  margin-bottom: 20px;
+}
+
+.add-inventory-button button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #28a745;
+  color: #fff;
+  cursor: pointer;
+}
+
+.popup-cardview {
+  display: block;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.popup-content {
+  background-color: #fefefe;
+  border-radius: 30px;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 40%;
+}
+
+.popup-content input{
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
 .close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-  font-size: 20px;
-  color: #333;
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
 }
 
-.inventory-table {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #ccc;
-}
-
-.inventory-item-header:hover {
-  background-color: #0056b3;
-}
-
-.inventory-item:hover {
-  background-color: #e6e6e6;
-}
-
-.inventory-item-header th {
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
   cursor: pointer;
 }
 
-.inventory-item-header th span {
-  margin-left: 5px;
+.button-container {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.add {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+
+.cancel {
+  padding: 8px 15px;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  background-color: #ddd;
+  color: #000;
+  cursor: pointer;
+}
+
+.inventory-cards {
+  display: row;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.inventory-card {
+
+  margin-right: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  background-color: #fff;
+}
+
+.inventory-card p {
+  margin-right: 50px;
 }

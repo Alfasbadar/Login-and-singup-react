@@ -1,105 +1,147 @@
 import React, { useState, useEffect } from 'react';
-import { addInventoryToDatabase, getAllInventory } from '../../Database/Database';
 import './Inventory.css';
+import { addInventoryToDatabase, getAllInventory, getAllProducts } from '../../Database/Database';
+import InventoryDetails from './InventoryDetails';
 
-function Inventory() {
-  const [showPopup, setShowPopup] = useState(false);
-  const [inventoryName, setInventoryName] = useState('');
-  const [inventoryLocation, setInventoryLocation] = useState('');
-  const [accessPasscode, setAccessPasscode] = useState('');
-  const [inventories, setInventories] = useState([]);
-  const [inventoryID, setInventoryId] = useState('');
-  const [sortOrder, setSortOrder] = useState({
-    id: 'desc',
-    name: 'desc',
-    location: 'desc',
-    itemsCount: 'desc'
+const Inventory = () => {
+  const [inventoryData, setInventoryData] = useState([]);
+  const [showAddInventoryForm, setShowAddInventoryForm] = useState(false);
+  const [newInventory, setNewInventory] = useState({
+    id: '',
+    name: '',
+    location: '',
+    accessKey: '',
+    products: []
   });
+  const [selectedInventory, setSelectedInventory] = useState(null);
+  const [allProducts, setAllProducts] = useState([]);
 
   useEffect(() => {
-    fetchInventory();
+    getAllInventoryFromDatabase();
+    fetchAllProducts(); // Fetch all products
   }, []);
 
-  const fetchInventory = async () => {
+  const getAllInventoryFromDatabase = async () => {
     try {
-      const inventoryData = await getAllInventory();
-      setInventories(inventoryData);
+      const allInventory = await getAllInventory();
+      setInventoryData(allInventory);
     } catch (error) {
       console.error('Error fetching inventory:', error);
     }
   };
 
-  const handleCreateInventory = () => {
-    const newInventory = { id: inventoryID, name: inventoryName, location: inventoryLocation, passcode: accessPasscode, productsByID: [] };
-    setInventories([...inventories, newInventory]);
-    setShowPopup(false);
-    if (addInventoryToDatabase(newInventory))
-      console.log("Inventory added to database")
-  };
-
-  const handleSort = (column) => {
-    const newSortOrder = { ...sortOrder };
-    newSortOrder[column] = sortOrder[column] === 'asc' ? 'desc' : 'asc';
-    setSortOrder(newSortOrder);
-  };
-
-  const sortedInventories = [...inventories].sort((a, b) => {
-    if (sortOrder.id === 'asc') {
-      return a.id.localeCompare(b.id);
-    } else {
-      return b.id.localeCompare(a.id);
+  const fetchAllProducts = async () => {
+    try {
+      const products = await getAllProducts();
+      setAllProducts(products);
+    } catch (error) {
+      console.error('Error fetching products:', error);
     }
-  });
+  };
+
+  const handleAddInventory = () => {
+    setShowAddInventoryForm(true);
+  };
+
+  const handleInventorySubmit = async () => {
+    try {
+      await addInventoryToDatabase(newInventory);
+      setInventoryData([...inventoryData, newInventory]);
+      setShowAddInventoryForm(false);
+      setNewInventory({
+        id: '',
+        name: '',
+        location: '',
+        accessKey: '',
+        products: []
+      });
+    } catch (error) {
+      console.error('Error adding inventory:', error);
+    }
+  };
+
+  const handleChange = (e) => {
+    setNewInventory({ ...newInventory, [e.target.name]: e.target.value });
+  };
+
+  const handleCancel = () => {
+    setShowAddInventoryForm(false);
+  };
+
+  const handleInventoryClick = (inventory) => {
+    setSelectedInventory(inventory);
+  };
+
+  const handleBackClick = () => {
+    setSelectedInventory(null);
+  };
+
+  if (selectedInventory) {
+    return (
+      <InventoryDetails inventory={selectedInventory} onBackClick={handleBackClick} products={allProducts}/>
+    );
+  }
 
   return (
-    <div className="inventory-container">
+    <div className="cool-component">
       <div className="search-bar">
         <input type="text" placeholder="Search..." />
-        <button className="search-button">Search</button>
-        <button className="add-inventory-button" onClick={() => setShowPopup(true)}>+ Inventory</button>
+        <button>Search</button>
       </div>
-
-      {showPopup && (
-        <div className="popup">
+      <div className="add-inventory-button">
+        <button onClick={handleAddInventory}>+ Add Inventory</button>
+      </div>
+      {showAddInventoryForm && (
+        <div className="popup-cardview">
           <div className="popup-content">
-            <span className="close" onClick={() => setShowPopup(false)}>&times;</span>
-            <h2>Create Inventory</h2>
-            <input type="text" placeholder="ID" value={inventoryID} onChange={(e) => setInventoryId(e.target.value)} />
-            <input type="text" placeholder="Inventory Name" value={inventoryName} onChange={(e) => setInventoryName(e.target.value)} />
-            <input type="text" placeholder="Location" value={inventoryLocation} onChange={(e) => setInventoryLocation(e.target.value)} />
-            <input type="password" placeholder="Access Passcode" value={accessPasscode} onChange={(e) => setAccessPasscode(e.target.value)} />
-            <div>
-              <button className="create-inventory-button" onClick={handleCreateInventory}>Create</button>
-              <button className="create-inventory-button" onClick={() => setShowPopup(false)}>Cancel</button>
+            <span className="close" onClick={handleCancel}>&times;</span>
+            <h2>Add Inventory</h2>
+            <input
+              type="text"
+              name="id"
+              placeholder="Inventory ID"
+              value={newInventory.id}
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="name"
+              placeholder="Inventory Name"
+              value={newInventory.name}
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="location"
+              placeholder="Location"
+              value={newInventory.location}
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="accessKey"
+              placeholder="Access Key"
+              value={newInventory.accessKey}
+              onChange={handleChange}
+            />
+            <div className="button-container">
+              <button className="add" onClick={handleInventorySubmit}>Add</button>
+              <button className="cancel" onClick={handleCancel}>Cancel</button>
             </div>
           </div>
         </div>
       )}
-
-      <div className="inventory-table">
-        <table>
-          <thead>
-            <tr className="inventory-item-header">
-              <th onClick={() => handleSort('id')}>ID {sortOrder.id === 'asc' ? <span>&uarr;</span> : <span>&darr;</span>}</th>
-              <th onClick={() => handleSort('name')}>Name {sortOrder.name === 'asc' ? <span>&uarr;</span> : <span>&darr;</span>}</th>
-              <th onClick={() => handleSort('location')}>Location {sortOrder.location === 'asc' ? <span>&uarr;</span> : <span>&darr;</span>}</th>
-              <th onClick={() => handleSort('itemsCount')}>Items Count {sortOrder.itemsCount === 'asc' ? <span>&uarr;</span> : <span>&darr;</span>}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedInventories.map((inventory, index) => (
-              <tr className="inventory-item" key={index}>
-                <td>{inventory.id}</td>
-                <td>{inventory.name}</td>
-                <td>{inventory.location}</td>
-                <td>{inventory.productsByID.length}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="inventory-cards">
+        {inventoryData.map((inventory, index) => (
+          <div key={index} className="inventory-card" onClick={() => handleInventoryClick(inventory)}>
+            <p>{inventory.id}</p>
+            <p>{inventory.name}</p>
+            <p>{inventory.location}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
-}
+};
 
 export default Inventory;

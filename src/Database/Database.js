@@ -1,6 +1,6 @@
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { firestore } from '../config/firebase'; // Assuming you have initialized Firestore in firebase.js
-import { getFirestore, setDoc, addDoc,getDoc, doc, collection, deleteDoc, getDocs } from 'firebase/firestore'; // Explicitly import getDocs
+import { getFirestore, setDoc, addDoc,getDoc,updateDoc, doc, collection, deleteDoc, getDocs } from 'firebase/firestore'; // Explicitly import getDocs
 
 //areyouwatchingclosely
 const logout = async () => {
@@ -88,6 +88,26 @@ const addInventoryToDatabase = async (inventoryDetails) => {
 };
 
 
+const addDistributorToDatabase = async (distributorDetails) => {
+  try {
+    const user = getUserEmail();
+    console.log("Authenticating user to add Inventory")
+    if (!user) {
+      console.error('User not authenticated');
+      return false; // User not authenticated
+    }
+    const db = getFirestore();
+    const userCollectionRef = collection(db, 'distribution', user, 'userDistribution');
+    const distributorDocumentRef = doc(userCollectionRef, distributorDetails.id);
+    await setDoc(distributorDocumentRef, distributorDetails);
+    return true;
+  } catch (error) {
+    console.error('Error adding distribution to Firestore: ');
+    return false;
+  }
+};
+
+
 // Function to remove a product from Firestore
 const removeProductFromDatabase = async (productId) => {
 try {
@@ -133,6 +153,32 @@ const getAllProducts = async () => {
     return []; // Return empty array if there's an error
   }
 };
+
+const getAllDistributor = async () => {
+  try {
+    const user = getUserEmail();
+    if (!user) {
+      console.error('User not authenticated');
+      return []; // Return empty array if user is not authenticated
+    }
+    
+    const db = getFirestore();
+    const useDistributorRef = collection(db, 'distribution', user, 'userDistribution');
+    const querySnapshot = await getDocs(useDistributorRef);
+    console.log(querySnapshot)
+    const distributionArray = [];
+    querySnapshot.forEach((doc) => {
+      distributionArray.push({ id: doc.id, ...doc.data() });
+    });
+    
+    console.log('All distributions retrieved:', distributionArray);
+    return distributionArray;
+  } catch (error) {
+    console.error('Error retrieving inventory from Firestore: ', error);
+    return []; // Return empty array if there's an error
+  }
+};
+
 const getAllInventory = async () => {
   try {
     const user = getUserEmail();
@@ -180,7 +226,6 @@ const getUserEmail = () => {
   return user ? user.email : null;
 };
 
-
 export {
   signup,
   login,
@@ -191,5 +236,7 @@ export {
   editProducts,
   getUserEmail,
   addInventoryToDatabase,
-  getAllInventory
+  getAllInventory,
+  addDistributorToDatabase,
+  getAllDistributor,
 };

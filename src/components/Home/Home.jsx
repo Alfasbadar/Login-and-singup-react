@@ -9,8 +9,12 @@ import Customers from '../Customers/Customers';
 import Dashboard from '../Dashboard/Dashboard'
 import Distribution from '../Distribution/Distribution';
 import { logout } from '../../Database/Database';
+import {getAllProducts} from '../../Database/Database'
 
 const Home = ({ user }) => {
+  const products=getAllProducts();
+  console.log(products)
+  console.log("Displayed products in home")
   const navigate=useNavigate();
 
   const [logoutAttempted, setLogoutAttempted] = useState(false);
