@@ -1,0 +1,23 @@
+/* DistributionBill.css */
+
+.bill-items {
+    margin-top: 10px;
+  }
+  
+  .search-bar {
+    position: relative;
+  }
+  
+  .suggestion {
+    cursor: pointer;
+    padding: 8px;
+  }
+  
+  .suggestion:hover {
+    background-color: #f0f0f0;
+  }
+  
+  input[type="number"] {
+    width: 60px;
+  }
+  

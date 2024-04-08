@@ -1,93 +1,83 @@
-// DetailedDistribution.jsx
-
 import React, { useState, useRef } from 'react';
 import './DetailedDistribution.css';
+import DistributionBill from './DistributionBill';
 
 function DetailedDistribution({ distributor, onBackClick, products }) {
   const [bills, setBills] = useState([]);
-  const [showAddBillModal, setShowAddBillModal] = useState(false);
-  const [newBill, setNewBill] = useState({
+  const [newBill, setNewBill] = useState({  // Define newBill state
     id: '',
     date: new Date().toLocaleDateString(),
     time: new Date().toLocaleTimeString(),
     products: [],
     total: 0
   });
-
+  const [showAddBillModal, setShowAddBillModal] = useState(false);
+  const [showAddProductModal, setShowAddProductModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [selectedBillIndex, setSelectedBillIndex] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [isQuantityFocused, setIsQuantityFocused] = useState(false);
-  const [isPriceFocused, setIsPriceFocused] = useState(false);
-
-  const quantityRefs = useRef([]);
-  const priceRefs = useRef([]);
   const searchRef = useRef(null);
 
   const handleNewBillClick = () => {
     setShowAddBillModal(true);
   };
 
-  const handleAddBill = () => {
-    setBills([...bills, newBill]);
-    setShowAddBillModal(false);
-    setNewBill({
-      id: '',
-      date: new Date().toLocaleDateString(),
-      time: new Date().toLocaleTimeString(),
-      products: [],
-      total: 0
-    });
+  const handleCreateBill = () => {
+    if (newBill.id.trim() !== '') {
+      setBills([...bills, newBill]);
+      setShowAddBillModal(false);
+      setNewBill({  // Reset newBill state
+        id: '',
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        products: [],
+        total: 0
+      });
+    }
   };
 
-  const handleCancelAddBill = () => {
-    setShowAddBillModal(false);
+
+  const handleAddProduct = () => {
+    if (selectedProduct) {
+      setSelectedProduct(null);
+      setShowAddProductModal(false);
+      const updatedBills = [...bills];
+      const selectedBill = updatedBills[selectedBillIndex];
+      const updatedProducts = [...selectedBill.products, selectedProduct];
+      selectedBill.products = updatedProducts;
+      setSelectedBillIndex(null);
+      setBills(updatedBills);
+    }
   };
 
-  const handleChange = (e) => {
-    setNewBill({ ...newBill, [e.target.name]: e.target.value });
+  const handleBillClick = (index) => {
+    if (index === selectedBillIndex) {
+      setSelectedBillIndex(null);
+    } else {
+      setSelectedBillIndex(index);
+    }
   };
-
-  const handleBillClick = (index, event) => {
-    event.stopPropagation();
-    const updatedBills = bills.map((bill, i) => {
-      if (i === index) {
-        return { ...bill, expanded: true }; // Always expand the clicked card
-      } else {
-        return { ...bill, expanded: false }; // Collapse other cards
-      }
-    });
-    setBills(updatedBills);
-  };
-  
-  const handleProductAdd = (product) => {
-    console.log("Clicked prodcut ",product)
-    const updatedProducts = [...newBill.products, product];
-    setNewBill({ ...newBill, products: updatedProducts });
-    setSearchTerm('');
-    setSearchSuggestions([]);
-    setIsQuantityFocused(true);
-    quantityRefs.current[updatedProducts.length - 1].focus();
-  };
-  
 
   const handleSearchChange = (e) => {
-    console.log("handling search term",e.target.value)
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-  
-    const filteredProducts = products.filter(product =>
-      product.id.toLowerCase().includes(term) ||
-      product.productName.toLowerCase().includes(term) ||
-      product.brand.toLowerCase().includes(term) ||
-      product.category.toLowerCase().includes(term)
-    );
-    setSearchSuggestions(filteredProducts);
-    console.log("filtered products are ",searchSuggestions)
+    if (term.trim() !== '') {
+      const filteredProducts = products.filter(product =>
+        product.id.toLowerCase().includes(term) ||
+        product.productName.toLowerCase().includes(term) ||
+        product.brand.toLowerCase().includes(term) ||
+        product.category.toLowerCase().includes(term)
+      );
+      setSearchSuggestions(filteredProducts);
+    } else {
+      setSearchSuggestions([]);
+    }
   };
 
-  const handleSearchFocus = (event) => {
-    event.stopPropagation();
+  
+  const handleSearchFocus = () => {
     setIsSearchFocused(true);
   };
 
@@ -95,21 +85,8 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
     setIsSearchFocused(false);
   };
 
-  const handleQuantityEnter = (e, idx) => {
-    if (e.key === 'Enter') {
-      setIsQuantityFocused(false);
-      setIsPriceFocused(true);
-      priceRefs.current[idx].focus();
-    }
-  };
-  
-
-  const handlePriceEnter = (e) => {
-    if (e.key === 'Enter') {
-      setIsPriceFocused(false);
-      setIsSearchFocused(true);
-      searchRef.current.focus();
-    }
+  const handleSuggestionClick = (product) => {
+    setSelectedProduct(product);
   };
 
   return (
@@ -129,115 +106,80 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
         {showAddBillModal && (
           <div className="modal">
             <div className="modal-content">
-              <span className="close" onClick={handleCancelAddBill}>&times;</span>
+              <span className="close" onClick={() => setShowAddBillModal(false)}>&times;</span>
               <h2>New Bill</h2>
               <input
                 type="text"
-                name="id"
                 placeholder="Enter Bill ID"
                 value={newBill.id}
-                onChange={handleChange}
+                onChange={(e) => setNewBill({ ...newBill, id: e.target.value })}
                 className="input"
               />
+              <label>Date:</label>
               <input
                 type="text"
-                name="date"
                 value={newBill.date}
-                onChange={handleChange}
+                readOnly
                 className="input"
-                disabled
               />
+              <label>Time:</label>
               <input
                 type="text"
-                name="time"
                 value={newBill.time}
-                onChange={handleChange}
+                readOnly
                 className="input"
-                disabled
               />
-              <div className="button-container">
-                <button onClick={handleAddBill} className="add-button">Create</button>
-                <button onClick={handleCancelAddBill} className="cancel-button">Cancel</button>
-              </div>
+              <button onClick={handleCreateBill} className="add-button">Create</button>
             </div>
           </div>
-        )}
-        {bills.length > 0 ? (
-          bills.map((bill, index) => (
-            <div key={index} className={`bill-card ${bill.expanded ? 'expanded' : ''}`} onClick={(event) => handleBillClick(index, event)}>
-              <div className="bill-header">
-                <p>{bill.id}</p>
-                <p>{bill.date}</p>
-                <p>{bill.time}</p>
-                <p>{bill.products.length}</p>
-                <p>{bill.total}</p>
-              </div>
-              {bill.expanded && (
-                <div className="bill-items">
-                  <input
-                    type="text"
-                    placeholder="Search and add product"
-                    className="product-input"
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    onFocus={handleSearchFocus}
-                    onBlur={handleSearchBlur}
-                    ref={searchRef}
-                  />
-                  {isSearchFocused && (
-                    <div className="search-suggestions">
-                      {searchSuggestions.map((product, idx) => (
-                        <div key={idx} className="suggestion" onClick={() => handleProductAdd(product.id)}>
-  <div>{product.id}</div>
-  <div>{product.brand}</div>
-  <div>{product.productName}</div>
-</div>
+          )}
+        {bills.map((bill, index) => (
+// In the parent component where DistributionBill is used
+<DistributionBill
+  bill={bill}
+  index={index}
+  onBillClick={handleBillClick}
+  searchTerm={searchTerm}
+  searchSuggestions={searchSuggestions}
+  isSearchFocused={isSearchFocused}
+  onSearchChange={handleSearchChange}
+  onSearchFocus={handleSearchFocus}
+  onSearchBlur={handleSearchBlur}
+  onSuggestionClick={handleSuggestionClick}
+  searchRef={searchRef}
+/>
 
-                      ))}
-                    </div>
-                  )}
-                  <button onClick={handleProductAdd} className="add-product-button">Add Product</button>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Product Name</th>
-                        <th>Quantity</th>
-                        <th>Buy Price</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-{bill.products.map((product, idx) => (
-  <tr key={idx}>
-    <td>{product.id}</td>
-    <td>{product.productName}</td>
-    <td>
-      <input
-        type="number"
-        ref={(ref) => quantityRefs.current[idx] = ref}
-        onKeyDown={handleQuantityEnter}
-      />
-    </td>
-    <td>
-      <input
-        type="number"
-        ref={(ref) => priceRefs.current[idx] = ref}
-        onKeyDown={handlePriceEnter}
-      />
-    </td>
-  </tr>
-))}
-
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          ))
-        ) : (
-          <p>No bills available.</p>
-        )}
+        ))}
       </div>
+      {showAddProductModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={() => setShowAddProductModal(false)}>&times;</span>
+            <h2>Add Product</h2>
+            <input
+              type="text"
+              placeholder="Search and add product"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="input"
+            />
+            <div className="search-suggestions">
+              {searchSuggestions.map((product, index) => (
+                <div
+                  key={index}
+                  className="suggestion"
+                  onClick={() => setSelectedProduct(product)}
+                >
+                  <div>{product.id}</div>
+                  <div>{product.productName}</div>
+                  <div>{product.brand}</div>
+                </div>
+              ))}
+            </div>
+            <button onClick={handleAddProduct} className="add-button">Add Product</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
