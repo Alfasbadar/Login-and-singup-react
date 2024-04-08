@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+// DetailedDistribution.jsx
+
+import React, { useState, useRef } from 'react';
 import './DetailedDistribution.css';
 
-function DetailedDistribution({ distributor, onBackClick }) {
+function DetailedDistribution({ distributor, onBackClick, products }) {
   const [bills, setBills] = useState([]);
   const [showAddBillModal, setShowAddBillModal] = useState(false);
   const [newBill, setNewBill] = useState({
@@ -11,6 +13,16 @@ function DetailedDistribution({ distributor, onBackClick }) {
     products: [],
     total: 0
   });
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isQuantityFocused, setIsQuantityFocused] = useState(false);
+  const [isPriceFocused, setIsPriceFocused] = useState(false);
+
+  const quantityRefs = useRef([]);
+  const priceRefs = useRef([]);
+  const searchRef = useRef(null);
 
   const handleNewBillClick = () => {
     setShowAddBillModal(true);
@@ -36,18 +48,68 @@ function DetailedDistribution({ distributor, onBackClick }) {
     setNewBill({ ...newBill, [e.target.name]: e.target.value });
   };
 
-  const handleProductAdd = () => {
-    // Implement product adding logic here
-  };
-
-  const handleBillClick = (index) => {
+  const handleBillClick = (index, event) => {
+    event.stopPropagation();
     const updatedBills = bills.map((bill, i) => {
       if (i === index) {
-        return { ...bill, expanded: !bill.expanded };
+        return { ...bill, expanded: true }; // Always expand the clicked card
+      } else {
+        return { ...bill, expanded: false }; // Collapse other cards
       }
-      return bill;
     });
     setBills(updatedBills);
+  };
+  
+  const handleProductAdd = (product) => {
+    console.log("Clicked prodcut ",product)
+    const updatedProducts = [...newBill.products, product];
+    setNewBill({ ...newBill, products: updatedProducts });
+    setSearchTerm('');
+    setSearchSuggestions([]);
+    setIsQuantityFocused(true);
+    quantityRefs.current[updatedProducts.length - 1].focus();
+  };
+  
+
+  const handleSearchChange = (e) => {
+    console.log("handling search term",e.target.value)
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+  
+    const filteredProducts = products.filter(product =>
+      product.id.toLowerCase().includes(term) ||
+      product.productName.toLowerCase().includes(term) ||
+      product.brand.toLowerCase().includes(term) ||
+      product.category.toLowerCase().includes(term)
+    );
+    setSearchSuggestions(filteredProducts);
+    console.log("filtered products are ",searchSuggestions)
+  };
+
+  const handleSearchFocus = (event) => {
+    event.stopPropagation();
+    setIsSearchFocused(true);
+  };
+
+  const handleSearchBlur = () => {
+    setIsSearchFocused(false);
+  };
+
+  const handleQuantityEnter = (e, idx) => {
+    if (e.key === 'Enter') {
+      setIsQuantityFocused(false);
+      setIsPriceFocused(true);
+      priceRefs.current[idx].focus();
+    }
+  };
+  
+
+  const handlePriceEnter = (e) => {
+    if (e.key === 'Enter') {
+      setIsPriceFocused(false);
+      setIsSearchFocused(true);
+      searchRef.current.focus();
+    }
   };
 
   return (
@@ -102,7 +164,7 @@ function DetailedDistribution({ distributor, onBackClick }) {
         )}
         {bills.length > 0 ? (
           bills.map((bill, index) => (
-            <div key={index} className={`bill-card ${bill.expanded ? 'expanded' : ''}`} onClick={() => handleBillClick(index)}>
+            <div key={index} className={`bill-card ${bill.expanded ? 'expanded' : ''}`} onClick={(event) => handleBillClick(index, event)}>
               <div className="bill-header">
                 <p>{bill.id}</p>
                 <p>{bill.date}</p>
@@ -112,7 +174,28 @@ function DetailedDistribution({ distributor, onBackClick }) {
               </div>
               {bill.expanded && (
                 <div className="bill-items">
-                  <input type="text" placeholder="Search and add product" className="product-input" />
+                  <input
+                    type="text"
+                    placeholder="Search and add product"
+                    className="product-input"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    onFocus={handleSearchFocus}
+                    onBlur={handleSearchBlur}
+                    ref={searchRef}
+                  />
+                  {isSearchFocused && (
+                    <div className="search-suggestions">
+                      {searchSuggestions.map((product, idx) => (
+                        <div key={idx} className="suggestion" onClick={() => handleProductAdd(product.id)}>
+  <div>{product.id}</div>
+  <div>{product.brand}</div>
+  <div>{product.productName}</div>
+</div>
+
+                      ))}
+                    </div>
+                  )}
                   <button onClick={handleProductAdd} className="add-product-button">Add Product</button>
                   <table>
                     <thead>
@@ -124,14 +207,27 @@ function DetailedDistribution({ distributor, onBackClick }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {bill.products.map((product, idx) => (
-                        <tr key={idx}>
-                          <td>{product.id}</td>
-                          <td>{product.name}</td>
-                          <td>{product.quantity}</td>
-                          <td>{product.buyPrice}</td>
-                        </tr>
-                      ))}
+{bill.products.map((product, idx) => (
+  <tr key={idx}>
+    <td>{product.id}</td>
+    <td>{product.productName}</td>
+    <td>
+      <input
+        type="number"
+        ref={(ref) => quantityRefs.current[idx] = ref}
+        onKeyDown={handleQuantityEnter}
+      />
+    </td>
+    <td>
+      <input
+        type="number"
+        ref={(ref) => priceRefs.current[idx] = ref}
+        onKeyDown={handlePriceEnter}
+      />
+    </td>
+  </tr>
+))}
+
                     </tbody>
                   </table>
                 </div>

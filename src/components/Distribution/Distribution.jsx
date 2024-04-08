@@ -3,7 +3,8 @@ import './Distribution.css';
 import { addDistributorToDatabase, getAllDistributor } from '../../Database/Database';
 import DetailedDistribution from './DetailedDistribution';
 
-function Distribution() {
+function Distribution({products}) {
+  console.log("Products prop  in distribution: ", products);
   const [showAddDistributorForm, setShowAddDistributorForm] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [newDistributor, setNewDistributor] = useState({
@@ -95,7 +96,7 @@ function Distribution() {
   return (
     <div className="distribution-container">
       {showDetailedDistribution ? (
-        <DetailedDistribution distributor={selectedDistributor} onBackClick={handleBackClick} />
+        <DetailedDistribution distributor={selectedDistributor} onBackClick={handleBackClick} products={products}/>
       ) : (
         <>
           <div className="header">

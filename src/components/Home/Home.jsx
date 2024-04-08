@@ -1,34 +1,37 @@
-import React,{useState} from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import Navbar from '../NavBar/NavBar';
 import Products from '../Products/Products';
 import Inventory from '../Inventory/Invenetory';
 import Orders from '../Orders/Orders';
 import Stores from '../Stores/Stores';
 import Customers from '../Customers/Customers';
-import Dashboard from '../Dashboard/Dashboard'
+import Dashboard from '../Dashboard/Dashboard';
 import Distribution from '../Distribution/Distribution';
-import { logout } from '../../Database/Database';
-import {getAllProducts} from '../../Database/Database'
+import { logout, getAllProducts } from '../../Database/Database';
 
 const Home = ({ user }) => {
-  const products=getAllProducts();
-  console.log(products)
-  console.log("Displayed products in home")
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
 
-  const [logoutAttempted, setLogoutAttempted] = useState(false);
+  useEffect(() => {
+    const fetchData = async () => {
+      const fetchedProducts = await getAllProducts();
+      setProducts(fetchedProducts);
+    };
+    fetchData();
+  }, []);
+
   const handleLogoutClick = async () => {
-    setLogoutAttempted(true)
-    const status=await logout();
-    if(status){
-      console.log("Logged out")
+    const status = await logout();
+    if (status) {
+      console.log("Logged out");
       navigate('/');
-    }
-    else{
-      console.log("Logout failed")
+    } else {
+      console.log("Logout failed");
     }
   };
+
   return (
     <div className="home-container">
       <div className="action-bar">
@@ -44,11 +47,11 @@ const Home = ({ user }) => {
         </div>
         <div className="body">
           <Routes>
-            <Route path="/dashboard" element={<Dashboard/>} />
-            <Route path="/distribution" element={<Distribution />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/distribution" element={<Distribution products={products} />} />
             <Route path="/orders" element={<Orders />} />
-            <Route path="/inventory" element={<Inventory />} />
-            <Route path="/products" element={<Products />} />
+            <Route path="/inventory" element={<Inventory products={products} />} />
+            <Route path="/products" element={<Products products={products} />} />
             <Route path="/stores" element={<Stores />} />
             <Route path="/customers" element={<Customers />} />
           </Routes>

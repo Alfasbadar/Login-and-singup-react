@@ -1,3 +1,5 @@
+/* DetailedDistribution.css */
+
 .detailed-distribution-container {
     padding: 20px;
   }
@@ -32,70 +34,12 @@
   }
   
   .bills {
-    display: contents;
+    display: flex;
     flex-wrap: wrap;
   }
   
   .add-bill {
     margin-bottom: 20px;
-  }
-  
-  .add-bill-form {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  
-  .input {
-    padding: 8px;
-    margin-right: 10px;
-  }
-  
-  .button-container {
-    margin-top: 10px;
-    text-align: right;
-  }
-  
-  .add-button,
-  .cancel-button {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .add-button {
-    background-color: #007bff;
-    color: #fff;
-    margin-right: 10px;
-  }
-  
-  .cancel-button {
-    background-color: #dc3545;
-    color: #fff;
-  }
-  
-  .bill-card {
-    display: flex;
-    flex-direction: column;
-    margin: 10px;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .bill-card.expanded {
-    height: auto;
-  }
-  
-  .bill-header {
-    display: flex;
-  }
-  
-  .bill-header p {
-    flex: 1;
   }
   
   .modal {
@@ -132,6 +76,29 @@
     text-decoration: none;
   }
   
+  .bill-card {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .bill-header {
+    display: flex;
+  }
+  
+  .bill-header p {
+    flex: 1;
+  }
+  
+  .bill-card.expanded {
+    height: auto;
+  }
+  
   .product-input {
     margin-bottom: 10px;
   }
@@ -159,3 +126,19 @@
     background-color: #f2f2f2;
   }
   
+  .search-suggestions {
+    position: absolute;
+    max-height: 300px;
+    max-width: 480px;
+    overflow-y: auto;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    margin-top: -10px; /* Adjust the margin-top to position above other elements */
+  }
+  
+  .suggestion{
+    display: flex;
+  }
