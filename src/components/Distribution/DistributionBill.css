@@ -1,23 +1,38 @@
-/* DistributionBill.css */
+.bill-card {
+  margin: 10px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: height 0.3s ease; /* Add transition for height */
+  position: relative; /* Set position to relative */
+}
 
-.bill-items {
-    margin-top: 10px;
-  }
-  
-  .search-bar {
-    position: relative;
-  }
-  
-  .suggestion {
-    cursor: pointer;
-    padding: 8px;
-  }
-  
-  .suggestion:hover {
-    background-color: #f0f0f0;
-  }
-  
-  input[type="number"] {
-    width: 60px;
-  }
-  
+.bill-header {
+  display: flex;
+}
+
+.bill-header p {
+  flex: 1;
+}
+
+.bill-card.expanded {
+  height: auto; /* Ensure the expanded state changes the height */
+}
+
+.product-input {
+  margin-bottom: 10px;
+  position: relative; /* Set position to relative */
+}
+
+.search-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.search-suggestions {
+margin-top: -70px;
+left: 3px;
+min-width: 300px;
+}

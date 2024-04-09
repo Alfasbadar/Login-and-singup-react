@@ -135,7 +135,9 @@
     width: 40%;
     background-color: #fff;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 20px;
+    margin-top: 0;
+    left: 48;
     z-index: 1;
   }
   

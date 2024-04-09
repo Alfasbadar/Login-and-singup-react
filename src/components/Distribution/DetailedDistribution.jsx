@@ -33,7 +33,8 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
         date: new Date().toLocaleDateString(),
         time: new Date().toLocaleTimeString(),
         products: [],
-        total: 0
+        total: 0,
+        expanded: false
       });
     }
   };
@@ -48,16 +49,23 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
       const updatedProducts = [...selectedBill.products, selectedProduct];
       selectedBill.products = updatedProducts;
       setSelectedBillIndex(null);
+      console.log(updatedBills)
       setBills(updatedBills);
     }
   };
 
   const handleBillClick = (index) => {
-    if (index === selectedBillIndex) {
-      setSelectedBillIndex(null);
-    } else {
-      setSelectedBillIndex(index);
-    }
+    setBills(prevBills => {
+      const updatedBills = prevBills.map((bill, i) => {
+        if (i === index) {
+          return { ...bill, expanded: !bill.expanded }; // Toggle expanded state
+        } else {
+          return { ...bill, expanded: false }; // Close other bill cards
+        }
+      });
+      return updatedBills;
+    });
+    setSelectedBillIndex(index); // Update the selected bill index
   };
 
   const handleSearchChange = (e) => {
@@ -76,7 +84,6 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
     }
   };
 
-  
   const handleSearchFocus = () => {
     setIsSearchFocused(true);
   };
@@ -86,6 +93,7 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
   };
 
   const handleSuggestionClick = (product) => {
+    console.log(product)
     setSelectedProduct(product);
   };
 
@@ -134,21 +142,22 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
           </div>
           )}
         {bills.map((bill, index) => (
-// In the parent component where DistributionBill is used
-<DistributionBill
-  bill={bill}
-  index={index}
-  onBillClick={handleBillClick}
-  searchTerm={searchTerm}
-  searchSuggestions={searchSuggestions}
-  isSearchFocused={isSearchFocused}
-  onSearchChange={handleSearchChange}
-  onSearchFocus={handleSearchFocus}
-  onSearchBlur={handleSearchBlur}
-  onSuggestionClick={handleSuggestionClick}
-  searchRef={searchRef}
-/>
-
+          <DistributionBill
+            key={index}
+            bill={bill}
+            index={index}
+            onBillClick={handleBillClick}
+            searchTerm={searchTerm}
+            searchSuggestions={searchSuggestions}
+            isSearchFocused={isSearchFocused}
+            onSearchChange={handleSearchChange}
+            onSearchFocus={handleSearchFocus}
+            onSearchBlur={handleSearchBlur}
+            onSuggestionClick={handleSuggestionClick}
+            searchRef={searchRef}
+            products={products} // Pass products prop to DistributionBill
+            expanded={index === selectedBillIndex} // Pass whether the bill is expanded or not
+          />
         ))}
       </div>
       {showAddProductModal && (
