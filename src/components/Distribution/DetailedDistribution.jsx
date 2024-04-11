@@ -1,10 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './DetailedDistribution.css';
 import DistributionBill from './DistributionBill';
+import { distributorCreateBill, retrieveBills } from '../../Database/Distribution';
 
 function DetailedDistribution({ distributor, onBackClick, products }) {
   const [bills, setBills] = useState([]);
-  const [newBill, setNewBill] = useState({  // Define newBill state
+  const [newBill, setNewBill] = useState({  
     id: '',
     date: new Date().toLocaleDateString(),
     time: new Date().toLocaleTimeString(),
@@ -20,13 +21,30 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const searchRef = useRef(null);
 
+  useEffect(() => {
+    // Load bills when component mounts
+    loadBills();
+  }, []);
+
+  const loadBills = async () => {
+    try {
+      const distributorBills = await retrieveBills(distributor.id);
+      setBills(distributorBills);
+    } catch (error) {
+      console.error('Error loading bills:', error);
+    }
+  };
+
   const handleNewBillClick = () => {
     setShowAddBillModal(true);
   };
 
-  const handleCreateBill = () => {
-    if (newBill.id.trim() !== '') {
-      setBills([...bills, newBill]);
+  const handleCreateBill = async () => {
+    console.log("Clicled create bill")
+    try {
+      console.log("Creating Bill with data", newBill);
+      const createdBill = await distributorCreateBill(newBill, distributor);
+      setBills([...bills, createdBill]);
       setShowAddBillModal(false);
       setNewBill({  // Reset newBill state
         id: '',
@@ -36,9 +54,10 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
         total: 0,
         expanded: false
       });
+    } catch (error) {
+      console.error('Error creating bill:', error);
     }
   };
-
 
   const handleAddProduct = () => {
     if (selectedProduct) {
@@ -49,7 +68,6 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
       const updatedProducts = [...selectedBill.products, selectedProduct];
       selectedBill.products = updatedProducts;
       setSelectedBillIndex(null);
-      console.log(updatedBills)
       setBills(updatedBills);
     }
   };
@@ -93,7 +111,6 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
   };
 
   const handleSuggestionClick = (product) => {
-    console.log(product)
     setSelectedProduct(product);
   };
 
@@ -140,7 +157,7 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
               <button onClick={handleCreateBill} className="add-button">Create</button>
             </div>
           </div>
-          )}
+        )}
         {bills.map((bill, index) => (
           <DistributionBill
             key={index}
@@ -156,6 +173,7 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
             onSuggestionClick={handleSuggestionClick}
             searchRef={searchRef}
             products={products} // Pass products prop to DistributionBill
+            distributor={distributor} // Pass distributor prop to DistributionBill
             expanded={index === selectedBillIndex} // Pass whether the bill is expanded or not
           />
         ))}

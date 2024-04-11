@@ -48,7 +48,7 @@ const Home = ({ user }) => {
         <div className="body">
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/distribution" element={<Distribution products={products} />} />
+            <Route path="/distribution" element={<Distribution user={user} products={products} />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/inventory" element={<Inventory products={products} />} />
             <Route path="/products" element={<Products products={products} />} />

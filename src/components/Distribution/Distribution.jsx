@@ -4,7 +4,6 @@ import { addDistributorToDatabase, getAllDistributor } from '../../Database/Data
 import DetailedDistribution from './DetailedDistribution';
 
 function Distribution({products}) {
-  console.log("Products prop  in distribution: ", products);
   const [showAddDistributorForm, setShowAddDistributorForm] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [newDistributor, setNewDistributor] = useState({
