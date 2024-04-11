@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './DetailedDistribution.css';
 import DistributionBill from './DistributionBill';
-import { distributorCreateBill, retrieveBills } from '../../Database/Distribution';
+import { distributorCreateBill, retrieveBills } from '../../Database/Database';
 
 function DetailedDistribution({ distributor, onBackClick, products }) {
   const [bills, setBills] = useState([]);
@@ -30,6 +30,7 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
     try {
       const distributorBills = await retrieveBills(distributor.id);
       setBills(distributorBills);
+      console.log(distributorBills)
     } catch (error) {
       console.error('Error loading bills:', error);
     }
@@ -40,11 +41,13 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
   };
 
   const handleCreateBill = async () => {
-    console.log("Clicled create bill")
+    console.log("Clicked create bill")
     try {
       console.log("Creating Bill with data", newBill);
       const createdBill = await distributorCreateBill(newBill, distributor);
-      setBills([...bills, createdBill]);
+      if (createdBill) {
+        setBills([...bills, newBill]);
+      }
       setShowAddBillModal(false);
       setNewBill({  // Reset newBill state
         id: '',

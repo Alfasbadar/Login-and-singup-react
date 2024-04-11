@@ -1,6 +1,6 @@
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { firestore } from '../config/firebase'; // Assuming you have initialized Firestore in firebase.js
-import { getFirestore, setDoc, addDoc,getDoc,updateDoc, doc, collection, deleteDoc, getDocs } from 'firebase/firestore'; // Explicitly import getDocs
+import { getFirestore, setDoc, addDoc,getDoc,updateDoc, doc,arrayUnion, collection, deleteDoc, getDocs } from 'firebase/firestore'; // Explicitly import getDocs
 
 //areyouwatchingclosely
 const logout = async () => {
@@ -87,6 +87,67 @@ const addInventoryToDatabase = async (inventoryDetails) => {
   }
 };
 
+const distributorCreateBill = async (newBill, distributor) => {
+  try {
+    console.log("Authenticating user");
+    const userEmail = getUserEmail();
+    if (!userEmail) {
+      console.error('User not authenticated');
+      return false; // User not authenticated
+    }
+
+    const db = getFirestore();
+    const userDistributionRef = doc(collection(db, 'distribution', userEmail, 'userDistribution'), distributor.id);
+
+    const distributorDocSnap = await getDoc(userDistributionRef);
+    if (distributorDocSnap.exists()) {
+      const distributorData = distributorDocSnap.data();
+      if (!distributorData.bills) {
+        distributorData.bills = {}; // Initialize bills as an object
+      }
+      distributorData.bills[newBill.id] = { date: newBill.date, time: newBill.time }; // Add bill as a property in the object
+      await setDoc(userDistributionRef, distributorData);
+      console.log('Bill added to Firestore:', newBill);
+      return true; // Bill added successfully
+    } else {
+      console.error('Distributor document does not exist.');
+      return false; // Distributor document does not exist
+    }
+  } catch (error) {
+    console.error('Error adding bill to Firestore:', error);
+    return false; // Error adding bill
+  }
+};
+
+const retrieveBills = async (distributorId) => {
+  try {
+    const userEmail = getUserEmail();
+    if (!userEmail) {
+      console.error('User not authenticated');
+      return []; // Return empty array if user is not authenticated
+    }
+
+    const db = getFirestore();
+    const userDistributionRef = doc(collection(db, 'distribution', userEmail, 'userDistribution'), distributorId);
+
+    const distributorDocSnap = await getDoc(userDistributionRef);
+    if (distributorDocSnap.exists()) {
+      const distributorData = distributorDocSnap.data();
+      const bills = distributorData.bills || {};
+      return Object.values(bills); // Return array of bills
+    } else {
+      console.error('Distributor document does not exist.');
+      return []; // Distributor document does not exist
+    }
+  } catch (error) {
+    console.error('Error retrieving bills from Firestore:', error);
+    return []; // Error retrieving bills
+  }
+};
+
+
+
+
 
 const addDistributorToDatabase = async (distributorDetails) => {
   try {
@@ -96,16 +157,27 @@ const addDistributorToDatabase = async (distributorDetails) => {
       console.error('User not authenticated');
       return false; // User not authenticated
     }
+    
+    const userEmail = getUserEmail(); // Get user email
+
     const db = getFirestore();
-    const userCollectionRef = collection(db, 'distribution', user, 'userDistribution');
-    const distributorDocumentRef = doc(userCollectionRef, distributorDetails.id);
+    
+    // Define the document reference for the user distribution
+    const userDistributionRef = doc(collection(db, 'distribution', userEmail, 'userDistribution'), distributorDetails.id);
+    
+    // Define the document reference for the distributor
+    const distributorDocumentRef = doc(collection(db, 'distribution', userEmail, 'userDistribution'), distributorDetails.id);
+    
+    // Set distributorDetails document
     await setDoc(distributorDocumentRef, distributorDetails);
+    
     return true;
   } catch (error) {
-    console.error('Error adding distribution to Firestore: ');
+    console.error('Error adding distribution to Firestore: ', error);
     return false;
   }
 };
+
 
 
 // Function to remove a product from Firestore
@@ -129,6 +201,7 @@ try {
   return false; // Product removal failed
 }
 };
+
 const getAllProducts = async () => {
   try {
     const user = getUserEmail();
@@ -239,4 +312,6 @@ export {
   getAllInventory,
   addDistributorToDatabase,
   getAllDistributor,
+  distributorCreateBill,
+  retrieveBills
 };
