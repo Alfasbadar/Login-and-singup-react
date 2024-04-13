@@ -87,7 +87,9 @@ const addInventoryToDatabase = async (inventoryDetails) => {
   }
 };
 
+// Database code for creating a new bill
 const distributorCreateBill = async (newBill, distributor) => {
+  console.log(newBill)
   try {
     console.log("Authenticating user");
     const userEmail = getUserEmail();
@@ -105,7 +107,7 @@ const distributorCreateBill = async (newBill, distributor) => {
       if (!distributorData.bills) {
         distributorData.bills = {}; // Initialize bills as an object
       }
-      distributorData.bills[newBill.id] = { date: newBill.date, time: newBill.time }; // Add bill as a property in the object
+      distributorData.bills[newBill.id] = { date: newBill.date, time: newBill.time, products: newBill.products }; // Add bill as a property in the object
       await setDoc(userDistributionRef, distributorData);
       console.log('Bill added to Firestore:', newBill);
       return true; // Bill added successfully
@@ -118,7 +120,6 @@ const distributorCreateBill = async (newBill, distributor) => {
     return false; // Error adding bill
   }
 };
-
 const retrieveBills = async (distributorId) => {
   try {
     const userEmail = getUserEmail();
@@ -129,12 +130,22 @@ const retrieveBills = async (distributorId) => {
 
     const db = getFirestore();
     const userDistributionRef = doc(collection(db, 'distribution', userEmail, 'userDistribution'), distributorId);
-
+    
     const distributorDocSnap = await getDoc(userDistributionRef);
     if (distributorDocSnap.exists()) {
       const distributorData = distributorDocSnap.data();
-      const bills = distributorData.bills || {};
-      return Object.values(bills); // Return array of bills
+      console.log("Distributor data", distributorData.bills);
+      
+      // Repack the bills into an array with id, date, and time properties
+      const bills = Object.entries(distributorData.bills || {}).map(([id, bill]) => ({
+        id: id,
+        date: bill.date,
+        time: bill.time,
+        products: bill.products || []
+      }));
+      
+      console.log("retrieved ", bills);
+      return bills; // Return the array of bills
     } else {
       console.error('Distributor document does not exist.');
       return []; // Distributor document does not exist
@@ -144,8 +155,38 @@ const retrieveBills = async (distributorId) => {
     return []; // Error retrieving bills
   }
 };
+const deleteBill = async (distributorId, billId) => {
+  try {
+    const userEmail = getUserEmail();
+    if (!userEmail) {
+      console.error('User not authenticated');
+      return false; // User not authenticated
+    }
 
+    const db = getFirestore();
+    const userDistributionRef = doc(collection(db, 'distribution', userEmail, 'userDistribution'), distributorId);
 
+    const distributorDocSnap = await getDoc(userDistributionRef);
+    if (distributorDocSnap.exists()) {
+      const distributorData = distributorDocSnap.data();
+      if (distributorData.bills && distributorData.bills[billId]) {
+        delete distributorData.bills[billId]; // Remove the bill from the object
+        await setDoc(userDistributionRef, distributorData);
+        console.log('Bill deleted from Firestore:', billId);
+        return true; // Bill deleted successfully
+      } else {
+        console.error('Bill does not exist.');
+        return false; // Bill does not exist
+      }
+    } else {
+      console.error('Distributor document does not exist.');
+      return false; // Distributor document does not exist
+    }
+  } catch (error) {
+    console.error('Error deleting bill from Firestore:', error);
+    return false; // Error deleting bill
+  }
+};
 
 
 
@@ -313,5 +354,6 @@ export {
   addDistributorToDatabase,
   getAllDistributor,
   distributorCreateBill,
-  retrieveBills
+  retrieveBills,
+  deleteBill
 };

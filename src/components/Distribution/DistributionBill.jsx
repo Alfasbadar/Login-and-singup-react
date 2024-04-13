@@ -1,16 +1,25 @@
-import React, { useState, useRef,useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './DistributionBill.css';
 
-function DistributionBill({ products, distributor }) {
+function DistributionBill({ products, bills, distributor, onBillClick, billid }) {
   const [addedProducts, setAddedProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [showOptions, setShowOptions] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const nameRef = useRef(null);
   const quantityRef = useRef(null);
   const priceRef = useRef(null);
+
+  useEffect(() => {
+    // Load products from the selected bill when billid changes
+    const selectedBill = bills.find(bill => bill.id === billid);
+    if (selectedBill) {
+      setAddedProducts(selectedBill.products);
+    }
+  }, [billid, bills]);
 
   const handleNameChange = (e) => {
     const { value } = e.target;
@@ -28,8 +37,6 @@ function DistributionBill({ products, distributor }) {
 
   const handleSuggestionClick = (product) => {
     nameRef.current.value = product.productName;
-    // Set only product name and ID, leave quantity and price empty
-    // setAddedProducts([...addedProducts, { id: product.id, productName: product.productName, quantity: '', price: '' }]);
     setSearchTerm('');
     setSearchResults([]);
     setSelectedSuggestionIndex(-1);
@@ -49,18 +56,20 @@ function DistributionBill({ products, distributor }) {
   };
 
   const addProduct = () => {
-    const newProduct = {
-      id: addedProducts.length + 1,
-      productName: nameRef.current.value,
-      quantity: quantityRef.current.value,
-      price: priceRef.current.value
-    };
-    setAddedProducts([...addedProducts, newProduct]);
-    // Clear input fields for the next entry
-    nameRef.current.value = '';
-    quantityRef.current.value = '';
-    priceRef.current.value = '';
-    nameRef.current.focus();
+    const selectedProduct = products.find(product => product.productName === nameRef.current.value);
+    if (selectedProduct) {
+      const newProduct = {
+        id: selectedProduct.id,
+        productName: selectedProduct.productName,
+        quantity: quantityRef.current.value,
+        price: priceRef.current.value
+      };
+      setAddedProducts([...addedProducts, newProduct]);
+      nameRef.current.value = '';
+      quantityRef.current.value = '';
+      priceRef.current.value = '';
+      nameRef.current.focus();
+    }
   };
 
   const handleSuggestionHover = (index) => {
@@ -83,32 +92,13 @@ function DistributionBill({ products, distributor }) {
     setShowOptions(!showOptions);
   };
 
-  const handleBillClick = async () => {
-    console.log("handle bill click")
-    try {
-      const newBill = {
-        id: '', // Include the bill ID
-        date: new Date().toLocaleDateString(), // Include the current date
-        time: new Date().toLocaleTimeString(), // Include the current time
-        products: addedProducts,
-        total: 0 // Calculate the total price
-      };
-
-      // Call the function to handle bill creation
-      // const createdBill = await handleCreateBill(newBill, distributor);
-
-      // console.log('Bill created:', createdBill);
-      
-      // Clear addedProducts state after successful creation
-      setAddedProducts([]);
-    } catch (error) {
-      console.error('Error creating bill:', error);
-      // Handle error (e.g., show error message to the user)
-    }
+  const handleBillClick = () => {
+    onBillClick(addedProducts, billid);
   };
 
   return (
     <div className="distribution-bill">
+      <h1>{distributor.DistributionBill}</h1>
       <table>
         <thead>
           <tr>
@@ -152,9 +142,10 @@ function DistributionBill({ products, distributor }) {
       </div>
       {addedProducts.length > 0 && (
         <div className="bill-products-section">
-            <div className="options">
-              <button onClick={handleBillClick}>Bill</button>
-            </div>
+          <div className="options">
+            <button onClick={handleBillClick}>Bill</button>
+            <button onClick={moveToInventory}>Move to Inventoy</button>
+          </div>
         </div>
       )}
       {searchTerm && (
