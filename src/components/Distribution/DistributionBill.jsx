@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './DistributionBill.css';
+import { getAllInventory } from '../../Database/Database';
+import MoveToInventoryPopup from './MoveToInventoryPopup';
 
 function DistributionBill({ products, bills, distributor, onBillClick, billid }) {
   const [addedProducts, setAddedProducts] = useState([]);
@@ -8,7 +10,9 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [showOptions, setShowOptions] = useState(false);
   const [expanded, setExpanded] = useState(false);
-
+  const [showInventoryPopup, setShowInventoryPopup] = useState(false);
+  const [inventoryData, setInventoryData] = useState([]);
+  const [loadingInventory, setLoadingInventory] = useState(false);
   const nameRef = useRef(null);
   const quantityRef = useRef(null);
   const priceRef = useRef(null);
@@ -96,6 +100,22 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
     onBillClick(addedProducts, billid);
   };
 
+  const moveToInventory = () => {
+    setLoadingInventory(true);
+    console.log("move to inventory clicked ", distributor.id, billid);
+    getAllInventory()
+      .then((inventory) => {
+        setInventoryData(inventory);
+        setShowInventoryPopup(true);
+      })
+      .catch((error) => {
+        console.error("Error fetching inventory:", error);
+      })
+      .finally(() => {
+        setLoadingInventory(false);
+      });
+  };
+
   return (
     <div className="distribution-bill">
       <h1>{distributor.DistributionBill}</h1>
@@ -144,7 +164,9 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
         <div className="bill-products-section">
           <div className="options">
             <button onClick={handleBillClick}>Bill</button>
-            <button onClick={moveToInventory}>Move to Inventoy</button>
+            <button onClick={moveToInventory} disabled={loadingInventory}>
+              {loadingInventory ? "Loading Inventory..." : "Move to Inventory"}
+            </button>
           </div>
         </div>
       )}
@@ -164,6 +186,14 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
             </div>
           ))}
         </div>
+      )}
+      {showInventoryPopup && (
+        <MoveToInventoryPopup
+          inventoryData={inventoryData}
+          billID={billid}
+          distributorID = {distributor.id}
+          onClose={() => setShowInventoryPopup(false)}
+        />
       )}
     </div>
   );

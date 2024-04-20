@@ -1,11 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './InventoryDetails.css'; // Add your CSS file for InventoryDetails styling
+import { retrieveBills } from '../../Database/Database';
 
 const InventoryDetails = ({ inventory, onBackClick, products }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [addedItems, setAddedItems] = useState([]);
   const [showSearchBar, setShowSearchBar] = useState(false);
+  const [retrievedProducts, setRetrievedProducts] = useState([]);
+
+  useEffect(() => {
+    console.log('Inventory:', inventory);
+    const inventoryProducts = inventory.products;
+    console.log("products in inventory", inventoryProducts.id);
+
+    // Extracting bill and distributor IDs together and storing them in an array
+    const billsArr = inventoryProducts.map((product) => {
+      return { billID: product.billID, distributorID: product.distributorID };
+    });
+    console.log('Bills:', billsArr);
+
+    // Retrieve and sort products for each distributor ID
+    const getAllProducts = async () => {
+      const allProducts = [];
+      for (let bill of billsArr) {
+        console.log('Bill ID:', bill.billID);
+        console.log('Distributor ID:', bill.distributorID);
+        const retrieved = await retrieveBills(bill.distributorID);
+        console.log("Retrieved bills for distributor:", retrieved);
+        if (retrieved && retrieved.length > 0) {
+          retrieved.forEach((bill) => {
+            const sortedProducts = bill.products.map((product) => ({
+              id: product.id,
+              productName: product.productName,
+              price: product.price,
+              quantity: product.quantity
+            })).sort((a, b) => {
+              if (a.productName < b.productName) {
+                return -1;
+              }
+              if (a.productName > b.productName) {
+                return 1;
+              }
+              return 0;
+            });
+            console.log("Sorted products for distributor:", sortedProducts);
+            allProducts.push(...sortedProducts);
+          });
+        }
+      }
+      return allProducts;
+    };
+
+    getAllProducts().then((allProducts) => {
+      setRetrievedProducts(allProducts);
+    });
+  }, [inventory]);
 
   const handleSearchChange = (event) => {
     const term = event.target.value;
@@ -85,17 +135,17 @@ const InventoryDetails = ({ inventory, onBackClick, products }) => {
           )}
         </div>
         <div className="card-container">
-          {addedItems.length > 0 ? (
-            addedItems.map((product) => (
+          {retrievedProducts.length > 0 ? (
+            retrievedProducts.map((product) => (
               <div key={product.id} className="product-card">
                 <p>{product.productName}</p>
                 <p>ID: {product.id}</p>
                 <p>Quantity: {product.quantity}</p>
-                <p>Distributor: {product.distributorName}</p>
+                <p>Price: {product.price}</p>
               </div>
             ))
           ) : (
-            <p>No products added</p>
+            <p>No products retrieved</p>
           )}
         </div>
       </div>
