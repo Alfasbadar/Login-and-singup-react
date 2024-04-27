@@ -18,6 +18,8 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
   const priceRef = useRef(null);
 
   useEffect(() => {
+
+    console.log(products)
     // Load products from the selected bill when billid changes
     const selectedBill = bills.find(bill => bill.id === billid);
     if (selectedBill) {
@@ -28,24 +30,34 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
   const handleNameChange = (e) => {
     const { value } = e.target;
     setSearchTerm(value);
-    // Filter products based on search term
+    // Filter products and variants based on search term
     const results = value ? products.filter(product =>
       product.productName.toLowerCase().includes(value.toLowerCase()) ||
       product.id.toLowerCase().includes(value.toLowerCase()) ||
       product.brand.toLowerCase().includes(value.toLowerCase()) ||
-      product.category.toLowerCase().includes(value.toLowerCase())
+      product.category.toLowerCase().includes(value.toLowerCase()) ||
+      (product.variants && product.variants.some(variant =>
+        variant.variantName.toLowerCase().includes(value.toLowerCase())
+      ))
     ) : [];
     setSearchResults(results);
     setSelectedSuggestionIndex(-1);
   };
+  
+  
 
   const handleSuggestionClick = (product) => {
-    nameRef.current.value = product.productName;
+    if (product.variantName) {
+      nameRef.current.value = product.variantName;
+    } else {
+      nameRef.current.value = product.productName;
+    }
     setSearchTerm('');
     setSearchResults([]);
     setSelectedSuggestionIndex(-1);
     quantityRef.current.focus();
   };
+  
 
   const handleQuantityKeyDown = (e) => {
     if (e.key === 'Enter') {

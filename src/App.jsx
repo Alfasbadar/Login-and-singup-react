@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; 
 import LoginSignup from './components/LoginSignup/LoginSignup';
+import { getAuth, onAuthStateChanged } from './config/firebase';
 import Home from './components/Home/Home';
 import LandingPage from './components/LandingPage/LandingPage';
-import { getAuth, onAuthStateChanged } from './config/firebase';
 
 function App() {
   const [initializing, setInitializing] = useState(true);

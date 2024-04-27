@@ -84,6 +84,7 @@
   cursor: pointer;
   margin-bottom: 20px;
   margin-right: 20px;
+  display: contents;
   padding: 20px;
   background-color: #fff;
   border-radius: 10px;

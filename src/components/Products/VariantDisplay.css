@@ -1,0 +1,41 @@
+.variant-display {
+    margin-top: 20px;
+}
+
+.variant-table {
+    width: 100%;
+    border: 1px solid #ccc;
+}
+
+.table-header,
+.variant-row {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+}
+
+.table-header {
+    font-weight: bold;
+}
+
+.header-cell,
+.variant-value,
+.input-cell {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+}
+
+.option-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.option-item {
+    margin-right: 10px;
+    margin-bottom: 5px;
+}
+
+.input-cell input[type="number"] {
+    width: 70px;
+    padding: 5px;
+}
