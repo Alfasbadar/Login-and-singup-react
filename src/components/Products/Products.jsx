@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import './Products.css';
 import AddProductDialog from './AddProductDialog';
 import { getAllProducts, removeProductFromDatabase } from '../../Database/Database';
+import VariantDisplay from './VariantDisplay';
 
 const Products = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isEditOpen, setEditOpen] = useState(false);
-    const [productToEdit,setProductToEdit] = useState(null)
-
+    const [productToEdit, setProductToEdit] = useState(null);
     const [sortField, setSortField] = useState('id');
     const [sortDirection, setSortDirection] = useState('asc');
 
@@ -17,22 +17,17 @@ const Products = () => {
         fetchProducts();
     }, []);
 
-
     const handleEdit = (id) => {
-      // Find the product with the matching id
+        const selectedProduct = products.find(product => product.id === id);
 
-      console.log("edit clicked")
-      const selectedProduct = products.find(product => product.id === id);
-    
-      if (selectedProduct) {
-        console.log("Selected product:", selectedProduct);
-        setProductToEdit(selectedProduct);
-        setEditOpen(true);
-        
-      } else {
-        console.log("Product not found with id:", id);
-      }
+        if (selectedProduct) {
+            setProductToEdit(selectedProduct);
+            setEditOpen(true);
+        } else {
+            console.log("Product not found with id:", id);
+        }
     }
+
     const fetchProducts = async () => {
         try {
             const productsData = await getAllProducts();
@@ -47,9 +42,9 @@ const Products = () => {
     };
 
     const handleCloseDialog = () => {
-      setIsDialogOpen(false);
-      setEditOpen(false);
-      fetchProducts();  
+        setIsDialogOpen(false);
+        setEditOpen(false);
+        fetchProducts();  
     };
 
     const handleSearchChange = (e) => {
@@ -71,7 +66,7 @@ const Products = () => {
     };
 
     const updateView = () => {
-      fetchProducts();
+        fetchProducts();
     }
 
     const handleDelete = (productId) => {
@@ -84,11 +79,11 @@ const Products = () => {
     };
 
     const getSortedHeaderClass = (field) => {
-      if (sortField === field) {
-          return sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc';
-      }
-      return '';
-  };
+        if (sortField === field) {
+            return sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc';
+        }
+        return '';
+    };
   
     return (
         <div className="products-container">
@@ -108,58 +103,75 @@ const Products = () => {
                 </button>
             </div>
             <div className="total-products">Total Products: {products.length}</div>
-            <table className="product-table">
-                <thead>
-                    <tr>
-                        <th onClick={() => handleSort('id')} className={`header-item ${getSortedHeaderClass('id')}`}>
-                            ID {sortField === 'id' && (sortDirection === 'asc' ? '↓' : '↑')}
-                        </th>
-                        <th>Brand</th>
-                        <th>ProductName</th>
-                        <th>Quantity</th>
-                        <th>Buy Price</th>
-                        <th>Sell Price</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-    {products.map(product => (
-        <React.Fragment key={product.id}>
-            <tr>
-                <td>{product.id}</td>
-                <td>{product.brand}</td>
-                <td>{product.productName}</td>
-                <td>{product.quantity}</td>
-                <td>{product.buyPrice}</td>
-                <td>{product.sellPrice}</td>
-                <td>
-                {/* <button className="edit-button" onClick={() => handleEdit(product.id)}>Edit</button>
-                    <button className="delete-button" onClick={() => handleDelete(product.id)}>Delete</button> */}
-                </td>
-            </tr>
-            {product.generatedVariants && product.generatedVariants.map((variant, index) => (
-                <tr key={`${product.id}-${index}`}>
-                    <td></td>
-                    <td></td>
-                    <td>{variant.SIZE}</td>
-                    <td>{variant.quantity || product.quantity}</td>
-                    <td>{variant.buyPrice || product.buyPrice}</td>
-                    <td>{variant.sellPrice || product.sellPrice}</td>
-                    <td>
-                    <button className="edit-button" onClick={() => handleEdit(product.id)}>Edit</button>
-                        <button className="delete-button" onClick={() => handleDelete(product.id)}>Delete</button>
-                    </td>
-                </tr>
+            {products.map(product => (
+                <div key={product.id}>
+                    <table className="product-table">
+                        <thead>
+                            <tr>
+                                <th>ID {product.id}</th>
+                                <th>{product.brand}</th>
+                                <th>{product.productName}</th>
+                                <th> Variants : {product.variants.length}</th>
+                                <th>Combinations : {product.generatedVariants.length}</th>
+                                <th>other</th>
+                            <th>
+                                <button className="edit-button" onClick={() => handleEdit(product.id)}>Edit</button>
+                                <button className="delete-button" onClick={() => handleDelete(product.id)}>Delete</button>
+                            </th>
+                            </tr>
+                        </thead>
+                        {/* <tbody>
+                            <tr>
+                                <td>{product.id}</td>
+                                <td>{product.brand}</td>
+                                <td>{product.productName}</td>
+                                <td>{product.quantity}</td>
+                                <td>{product.buyPrice}</td>
+                                <td>{product.sellPrice}</td>
+                            </tr>
+                        </tbody> */}
+                    </table>
+                    <table className="variant-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Brand</th>
+                                <th>Product</th>
+                                {product.variants.map((variant, variantIndex) => (
+                                    <th key={variantIndex}>{variant.variantName}</th>
+                                ))}
+                                <th>Quantity</th>
+                                <th>Buy Price</th>
+                                <th>Sell Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {product.generatedVariants && product.generatedVariants.map((variant, index) => (
+                                <tr key={index}>
+                                    <td>{product.id}</td>
+                                    <td>{product.brand}</td>
+
+                                    <td>{product.productName}</td>
+
+                                    {product.variants.map((productVariant, variantIndex) => (
+                                        <td key={`${product.id}-${index}-${variantIndex}`}>
+                                            {variant[productVariant.variantName]}
+                                        </td>
+                                    ))}
+                                    <td>{variant.quantity || product.quantity}</td>
+                                    <td>{variant.buyPrice || product.buyPrice}</td>
+                                    <td>{variant.sellPrice || product.sellPrice}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             ))}
-        </React.Fragment>
-    ))}
-</tbody>
-            </table>
             {isDialogOpen && <AddProductDialog onClose={handleCloseDialog} />}
             {isEditOpen && <AddProductDialog onClose={handleCloseDialog} onChange={updateView} product={productToEdit} />}
-
         </div>
     );
+    
 };
 
 export default Products;

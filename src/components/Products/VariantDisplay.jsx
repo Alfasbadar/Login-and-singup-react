@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './VariantDisplay.css';
 
-function VariantDisplay({ variants, quantity: initialQuantity = 0, bp: initialBp = 0, sp: initialSp = 0, onSave }) {
-    // State to store the generated variants and current quantity, buy price, and sell price
+function VariantDisplay({ variants, onSave }) {
     const [generatedVariants, setGeneratedVariants] = useState([]);
     const [variantStates, setVariantStates] = useState([]);
 
     useEffect(() => {
         generateCombinations(variants);
-    }, [variants, variants.map(v => v.options.length), variants.map(v => v.options)]);
+    }, [variants]);
+
     const generateCombinations = (variants) => {
         if (variants.length === 0) return [[]];
         
@@ -27,19 +27,16 @@ function VariantDisplay({ variants, quantity: initialQuantity = 0, bp: initialBp
     
         generate(0, []);
         
-        // Preserve existing variant states while adding the new variant and its options
         const existingVariantStates = [...variantStates];
         const newVariantStates = [];
         for (let i = 0; i < combinations.length; i++) {
-            // Preserve existing variant state if it exists
             if (i < existingVariantStates.length) {
                 newVariantStates.push(existingVariantStates[i]);
             } else {
-                // Otherwise, initialize state for the new variant
                 newVariantStates.push({
-                    quantity: initialQuantity,
-                    bp: initialBp,
-                    sp: initialSp,
+                    quantity: 0,
+                    bp: 0,
+                    sp: 0,
                 });
             }
         }
@@ -49,9 +46,7 @@ function VariantDisplay({ variants, quantity: initialQuantity = 0, bp: initialBp
     };
     
 
-    // Function to handle saving generated variants
     const handleSaveVariants = () => {
-        // Transform generatedVariants into the desired format
         const formattedVariants = generatedVariants.map((combination, index) => {
             const variantObject = {};
             combination.forEach((variant) => {
@@ -69,23 +64,19 @@ function VariantDisplay({ variants, quantity: initialQuantity = 0, bp: initialBp
         onSave(formattedVariants);
     };
 
-    // Function to handle editing variant option
-    const handleEditOption = (variantIndex, optionIndex, newValue) => {
+    const handleEditOption = (variantIndex, inputType, newValue) => {
         const updatedVariantStates = [...variantStates];
-        if (optionIndex === 'quantity') {
-            // Update quantity separately
+        if (inputType === 'quantity') {
             updatedVariantStates[variantIndex] = {
                 ...updatedVariantStates[variantIndex],
                 quantity: newValue,
             };
-        } else if (optionIndex === 'bp') {
-            // Update buy price separately
+        } else if (inputType === 'bp') {
             updatedVariantStates[variantIndex] = {
                 ...updatedVariantStates[variantIndex],
                 bp: newValue,
             };
-        } else if (optionIndex === 'sp') {
-            // Update sell price separately
+        } else if (inputType === 'sp') {
             updatedVariantStates[variantIndex] = {
                 ...updatedVariantStates[variantIndex],
                 sp: newValue,
