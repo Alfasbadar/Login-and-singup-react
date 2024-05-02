@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import './VariantDisplay.css';
 
-function VariantDisplay({ variants, onSave }) {
+function VariantDisplay({ variants, product, onSave }) {
     const [generatedVariants, setGeneratedVariants] = useState([]);
     const [variantStates, setVariantStates] = useState([]);
 
     useEffect(() => {
         generateCombinations(variants);
     }, [variants]);
+
+    useEffect(() => {
+        if (product) {
+            updateVariantStatesFromProduct(product);
+        }
+    }, [product, variants]); // Added variants to the dependency array
 
     const generateCombinations = (variants) => {
         if (variants.length === 0) return [[]];
@@ -34,9 +40,9 @@ function VariantDisplay({ variants, onSave }) {
                 newVariantStates.push(existingVariantStates[i]);
             } else {
                 newVariantStates.push({
-                    quantity: 0,
-                    bp: 0,
-                    sp: 0,
+                    quantity: product ? product.quantity : 0,
+                    bp: product ? product.buyPrice : 0,
+                    sp: product ? product.sellPrice : 0,
                 });
             }
         }
@@ -45,6 +51,24 @@ function VariantDisplay({ variants, onSave }) {
         setVariantStates(newVariantStates);
     };
     
+    const updateVariantStatesFromProduct = (product) => {
+        const updatedStates = variantStates.map(state => ({
+            ...state,
+            quantity: product.quantity,
+            bp: product.buyPrice,
+            sp: product.sellPrice,
+        }));
+        setVariantStates(updatedStates);
+    };
+
+    const handleEditOption = (variantIndex, inputType, newValue) => {
+        const updatedVariantStates = [...variantStates];
+        updatedVariantStates[variantIndex] = {
+            ...updatedVariantStates[variantIndex],
+            [inputType]: newValue,
+        };
+        setVariantStates(updatedVariantStates);
+    };
 
     const handleSaveVariants = () => {
         const formattedVariants = generatedVariants.map((combination, index) => {
@@ -56,33 +80,12 @@ function VariantDisplay({ variants, onSave }) {
             return {
                 ...variantObject,
                 quantity: variantStates[index].quantity,
-                buyPrice: variantStates[index].bp,
-                sellPrice: variantStates[index].sp,
+                bp: variantStates[index].bp,
+                sp: variantStates[index].sp,
             };
         });
 
         onSave(formattedVariants);
-    };
-
-    const handleEditOption = (variantIndex, inputType, newValue) => {
-        const updatedVariantStates = [...variantStates];
-        if (inputType === 'quantity') {
-            updatedVariantStates[variantIndex] = {
-                ...updatedVariantStates[variantIndex],
-                quantity: newValue,
-            };
-        } else if (inputType === 'bp') {
-            updatedVariantStates[variantIndex] = {
-                ...updatedVariantStates[variantIndex],
-                bp: newValue,
-            };
-        } else if (inputType === 'sp') {
-            updatedVariantStates[variantIndex] = {
-                ...updatedVariantStates[variantIndex],
-                sp: newValue,
-            };
-        }
-        setVariantStates(updatedVariantStates);
     };
 
     return (
@@ -105,7 +108,7 @@ function VariantDisplay({ variants, onSave }) {
                                     <input
                                         type="text"
                                         value={variant[variants[idx].variantName]}
-                                        onChange={(e) => handleEditOption(index, idx, e.target.value)}
+                                        readOnly
                                     />
                                 </div>
                             ))}
@@ -134,7 +137,7 @@ function VariantDisplay({ variants, onSave }) {
                     ))}
                 </div>
             </div>
-            <button onClick={handleSaveVariants}>Save Variants</button>
+            {/* No need for a button, changes are saved instantly */}
         </div>
     );
 }

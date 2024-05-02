@@ -103,6 +103,8 @@ const Products = () => {
                 </button>
             </div>
             <div className="total-products">Total Products: {products.length}</div>
+            {isDialogOpen && <AddProductDialog onClose={handleCloseDialog} />}
+            {isEditOpen && <AddProductDialog onClose={handleCloseDialog} onChange={updateView} product={productToEdit} />}
             {products.map(product => (
                 <div key={product.id}>
                     <table className="product-table">
@@ -167,8 +169,6 @@ const Products = () => {
                     </table>
                 </div>
             ))}
-            {isDialogOpen && <AddProductDialog onClose={handleCloseDialog} />}
-            {isEditOpen && <AddProductDialog onClose={handleCloseDialog} onChange={updateView} product={productToEdit} />}
         </div>
     );
     

@@ -1,3 +1,5 @@
+// AddProductDialog.js
+
 import React, { useState, useRef, useEffect } from 'react';
 import './AddProductDialog.css';
 import VariantDisplay from './VariantDisplay';
@@ -23,7 +25,7 @@ function AddProductDialog({ onClose, onChange, product }) {
     const [gstNo, setGstNo] = useState('');
     const [heading, setHeading] = useState('Add Product');
     const [buttonText, setButtonText] = useState('Add');
-    const [generatedVariants, setGeneratedVariants] = useState(null);
+    const [generatedVariants, setGeneratedVariants] = useState([]);
 
     useEffect(() => {
         if (product !== null && product) {
@@ -100,33 +102,82 @@ function AddProductDialog({ onClose, onChange, product }) {
         }
     };
 
+
     const handleSubmit = () => {
-        const productData = {
-            id,
-            brand,
-            productName,
-            category,
-            quantity,
-            unit,
-            description,
-            buyPrice,
-            sellPrice,
-            tax,
-            distributorName,
-            gstNo,
-            variants,
-            generatedVariants
+        // Arrays to store variant names and option names
+        const variantNamesArray = [];
+        const optionsArray = [];
+    
+        // Loop through each variant to extract names and options
+        variants.forEach(variant => {
+            // Push variant name into variantNamesArray
+            variantNamesArray.push(variant.variantName);
+    
+            // Extract option names, sort them, and push into optionsArray
+            const sortedOptions = variant.options.map(option => option.name).sort();
+            optionsArray.push(sortedOptions);
+        });
+    
+        // Generate combinations of options
+        const combinations = [];
+        const generateCombinations = (index, current) => {
+            if (index === optionsArray.length) {
+                combinations.push(current);
+                return;
+            }
+            optionsArray[index].forEach(option => {
+                generateCombinations(index + 1, [...current, option]);
+            });
         };
-
+        generateCombinations(0, []);
+    
+        // Create products for each combination of options
+        const products = [];
+        combinations.forEach(combination => {
+            // Create product name by concatenating variant names and option names
+            const productName = combination.map((option, index) => `${variantNamesArray[index]}: ${option}`).join(', ');
+    
+            // Create product object
+            const product = {
+                id: "", // Generate a unique ID for each product (you may need to import uuidv4)
+                brand,
+                productName,
+                category,
+                quantity,
+                unit,
+                description,
+                buyPrice,
+                sellPrice,
+                tax,
+                distributorName,
+                gstNo,
+                variants,
+                generatedVariants,
+                variantNames: variantNamesArray,
+                options: optionsArray,
+            };
+    
+            products.push(product);
+        });
+    
+        // Log details of each product
+        products.forEach(product => {
+            console.log(product)
+        });
+    
+        // Update or add products to the database (not implemented here)
         if (buttonText === 'Edit') {
-            editProducts(productData);
+            // editProducts(productData);
         } else {
-            addProductToDatabase(productData);
+            // addProductToDatabase(productData);
         }
-
+    
         onClose();
         onChange();
     };
+    
+    
+    
 
     const handleSaveVariants = (generatedVariants) => {
         setGeneratedVariants(generatedVariants);
@@ -237,7 +288,7 @@ function AddProductDialog({ onClose, onChange, product }) {
                     />
                     <button onClick={handleAddVariant} className="btn-action">+</button>
                 </div>
-                <VariantDisplay variants={variants} generatedVariants={generatedVariants} onSave={handleSaveVariants} />
+                <VariantDisplay variants={variants} product={product} generatedVariants={generatedVariants} onSave={handleSaveVariants} />
                 <div className="form-buttons">
                     <button onClick={handleSubmit} className="btn-add">{buttonText}</button>
                     <button onClick={onClose} className="btn-cancel">Cancel</button>
