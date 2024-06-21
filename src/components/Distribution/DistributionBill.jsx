@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './DistributionBill.css';
 import { getAllInventory } from '../../Database/Database';
 import MoveToInventoryPopup from './MoveToInventoryPopup';
@@ -9,7 +9,6 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
   const [searchResults, setSearchResults] = useState([]);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [showOptions, setShowOptions] = useState(false);
-  const [expanded, setExpanded] = useState(false);
   const [showInventoryPopup, setShowInventoryPopup] = useState(false);
   const [inventoryData, setInventoryData] = useState([]);
   const [loadingInventory, setLoadingInventory] = useState(false);
@@ -18,9 +17,6 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
   const priceRef = useRef(null);
 
   useEffect(() => {
-
-    console.log(products)
-    // Load products from the selected bill when billid changes
     const selectedBill = bills.find(bill => bill.id === billid);
     if (selectedBill) {
       setAddedProducts(selectedBill.products);
@@ -30,7 +26,6 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
   const handleNameChange = (e) => {
     const { value } = e.target;
     setSearchTerm(value);
-    // Filter products and variants based on search term
     const results = value ? products.filter(product =>
       product.productName.toLowerCase().includes(value.toLowerCase()) ||
       product.id.toLowerCase().includes(value.toLowerCase()) ||
@@ -43,8 +38,6 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
     setSearchResults(results);
     setSelectedSuggestionIndex(-1);
   };
-  
-  
 
   const handleSuggestionClick = (product) => {
     if (product.variantName) {
@@ -57,7 +50,6 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
     setSelectedSuggestionIndex(-1);
     quantityRef.current.focus();
   };
-  
 
   const handleQuantityKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -114,7 +106,6 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
 
   const moveToInventory = () => {
     setLoadingInventory(true);
-    console.log("move to inventory clicked ", distributor.id, billid);
     getAllInventory()
       .then((inventory) => {
         setInventoryData(inventory);
@@ -203,7 +194,7 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
         <MoveToInventoryPopup
           inventoryData={inventoryData}
           billID={billid}
-          distributorID = {distributor.id}
+          distributorID={distributor.id}
           onClose={() => setShowInventoryPopup(false)}
         />
       )}

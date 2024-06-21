@@ -88,7 +88,6 @@
   color: white; /* Text color for selected menu */
 }
 
-
 .navbar ul li a:hover::before {
   width: 100%; /* Ensure hover effect width is 100% */
 }
@@ -103,4 +102,26 @@
 
 .navbar ul li a.active:hover::before {
   transform: translateY(-100%); /* Move the sliding border to the top */
+}
+
+/* Responsive Design for Mobile View */
+@media (max-width: 400px) {
+  .navbar-container {
+    width: 50px; /* Adjusted width for icons only */
+  }
+  .navbar ul li {
+    display: flex;
+    justify-content: center;
+  }
+  .navbar ul li a {
+    padding: 10px 5px; /* Less padding for icons */
+    text-align: center;
+  }
+  .navbar ul li a span {
+    display: none; /* Hide text */
+  }
+  .navbar ul li a img {
+    width: 20px; /* Size of the icon */
+    height: 20px;
+  }
 }

@@ -52,7 +52,7 @@ function MoveToInventoryPopup({ inventoryData, onClose, billID, distributorID })
   // Map over inventories and display as lists
   const inventoryItems = inventories.map((inventory, index) => (
     <li key={index} onClick={() => handleInventoryClick(inventory)}>
-      ID: {inventory.id} - Name: {inventory.name} - Location: {inventory.location}
+      {inventory.id} - {inventory.name} - {inventory.location}
     </li>
   ));
 
@@ -66,7 +66,7 @@ function MoveToInventoryPopup({ inventoryData, onClose, billID, distributorID })
         <ul>
           {inventoryItems}
         </ul>
-        <button onClick={onClose}>Close</button>
+        <button className="movetoinventoryclose" onClick={onClose}>Close</button>
       </div>
     </div>
   );

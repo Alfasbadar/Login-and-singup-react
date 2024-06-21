@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './DetailedDistribution.css';
 import DistributionBill from './DistributionBill';
-import { distributorCreateBill, retrieveBills,deleteBill } from '../../Database/Database';
-import { update } from 'firebase/database';
+import { distributorCreateBill, retrieveBills, deleteBill } from '../../Database/Database';
+import backButton from './../../Assets/back.png';
 
 function DetailedDistribution({ distributor, onBackClick, products }) {
   const [bills, setBills] = useState([]);
-  const [newBill, setNewBill] = useState({  
+  const [newBill, setNewBill] = useState({
     id: '',
     date: new Date().toLocaleDateString(),
     time: new Date().toLocaleTimeString(),
     products: [],
-    total: 0
+    total: 0,
+    expanded: false,
   });
   const [showAddBillModal, setShowAddBillModal] = useState(false);
   const [showAddProductModal, setShowAddProductModal] = useState(false);
@@ -22,7 +23,6 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const searchRef = useRef(null);
 
-
   useEffect(() => {
     // Load bills when component mounts
     loadBills();
@@ -32,9 +32,8 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
     try {
       const distributorBills = await retrieveBills(distributor.id);
       setBills(distributorBills);
-      console.log("Calling bills from detailed distributor bills")
-      console.log(bills,distributorBills)
-
+      console.log('Calling bills from detailed distributor bills');
+      console.log(bills, distributorBills);
     } catch (error) {
       console.error('Error loading bills:', error);
     }
@@ -55,7 +54,7 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
         time: new Date().toLocaleTimeString(),
         products: [],
         total: 0,
-        expanded: false
+        expanded: false,
       });
     } catch (error) {
       console.error('Error creating bill:', error);
@@ -66,88 +65,62 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
     if (selectedProduct) {
       setSelectedProduct(null);
       setShowAddProductModal(false);
-      setNewBill(prevBill => ({
+      setNewBill((prevBill) => ({
         ...prevBill,
-        products: [selectedProduct, ...prevBill.products]
+        products: [selectedProduct, ...prevBill.products],
       }));
     }
   };
 
-  const handleOnBillClick= (addedProducts,billId)=>{
-    console.log("handle on bill click")
-    console.log("bill click Detailed Distribution")
-console.log(products)  // add the products inside the bill and console the bill.
-console.log(billId)
-const updatedBill = {
-  ...newBill,
-  products:addedProducts
-};
-updatedBill.id=billId
-console.log(updatedBill)
-setNewBill(updatedBill);
+  const handleOnBillClick = (addedProducts, billId) => {
+    console.log('handle on bill click');
+    console.log('bill click Detailed Distribution');
+    console.log(products); // add the products inside the bill and console the bill.
+    console.log(billId);
+    const updatedBill = {
+      ...newBill,
+      products: addedProducts,
+    };
+    updatedBill.id = billId;
+    console.log(updatedBill);
+    setNewBill(updatedBill);
 
+    // Console log the entire updated bill
+    console.log('Updated Bill:', updatedBill);
 
-// Console log the entire updated bill
-console.log("Updated Bill:", updatedBill);
+    console.log(distributor.id);
+    console.log(bills);
 
-console.log(distributor.id)
-console.log(bills)
+    // Delete old bill
+    if (deleteBill(distributor.id, billId)) {
+      console.log('Bill deleted for updation');
+      if (distributorCreateBill(updatedBill, distributor)) console.log('Bill updated with products');
+    }
 
+    // Update with new bill
+  };
 
-
-//delete old bill
-  if(deleteBill(distributor.id,billId)){
-    console.log("Bill deleted for updation")
-    if(distributorCreateBill(updatedBill,distributor))
-    console.log("Bill updated with products")
-  }
-
-//update with new bill
-};
   const handleBillClick = async (index) => {
-    console.log("handleBillClick >>>")
+    console.log('handleBillClick >>>');
     setSelectedBillIndex(index);
-    setBills(prevBills => {
+    setBills((prevBills) => {
       const updatedBills = prevBills.map((bill, i) => {
         return { ...bill, expanded: i === index ? !bill.expanded : false };
       });
       return updatedBills;
     });
-  
-    // Create a bill with the entered products when a bill is clicked
-    // const selectedBill = bills[index];
-    // if (!selectedBill.id) {
-    //   try {
-    //     const createdBill = await distributorCreateBill(selectedBill, distributor);
-    //     // Update the bills array with the newly created bill
-    //     setBills(prevBills => {
-    //       const updatedBills = [...prevBills];
-    //       updatedBills[index].id = createdBill.id;
-    //       return updatedBills;
-    //     });
-    //   } catch (error) {
-    //     console.error('Error creating bill:', error);
-    //   }
-    // } else {
-    //   // If the bill already exists, update it with the new products
-    //   try {
-    //     await distributorCreateBill(selectedBill, distributor);
-    //   } catch (error) {
-    //     console.error('Error updating bill:', error);
-    //   }
-    // }
   };
-  
 
   const handleSearchChange = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
     if (term.trim() !== '') {
-      const filteredProducts = products.filter(product =>
-        product.id.toLowerCase().includes(term) ||
-        product.productName.toLowerCase().includes(term) ||
-        product.brand.toLowerCase().includes(term) ||
-        product.category.toLowerCase().includes(term)
+      const filteredProducts = products.filter(
+        (product) =>
+          product.id.toLowerCase().includes(term) ||
+          product.productName.toLowerCase().includes(term) ||
+          product.brand.toLowerCase().includes(term) ||
+          product.category.toLowerCase().includes(term)
       );
       setSearchSuggestions(filteredProducts);
     } else {
@@ -170,8 +143,10 @@ console.log(bills)
   return (
     <div className="detailed-distribution-container">
       <div className="header">
-        <button onClick={onBackClick} className="back-button">Back</button>
-        <div className="distributor-info">
+        <button onClick={onBackClick} className="back-button">
+          <img src={backButton} alt="Back" />
+        </button>
+        <div className="detailed-distributor-info">
           <h2>{distributor.name}</h2>
           <p>ID: {distributor.id}</p>
           <p>Location: {distributor.location}</p>
@@ -179,43 +154,41 @@ console.log(bills)
       </div>
       <div className="bills">
         <div className="add-bill">
-          <button onClick={handleNewBillClick} className="add-bill-button">+ Bill</button>
+          <button onClick={handleNewBillClick} className="add-bill-button">
+            + Bill
+          </button>
         </div>
         {showAddBillModal && (
-          <div className="modal">
-            <div className="modal-content">
-              <span className="close" onClick={() => setShowAddBillModal(false)}>&times;</span>
+          <div className="detailed-modal">
+            <div className="detailed-modal-content">
+              <span className="detailed-close" onClick={() => setShowAddBillModal(false)}>
+                &times;
+              </span>
               <h2>New Bill</h2>
               <input
                 type="text"
                 placeholder="Enter Bill ID"
                 value={newBill.id}
                 onChange={(e) => setNewBill({ ...newBill, id: e.target.value })}
-                className="input"
+                className="detailed-input"
               />
               <label>Date:</label>
-              <input
-                type="text"
-                value={newBill.date}
-                readOnly
-                className="input"
-              />
+              <input type="text" value={newBill.date} readOnly className="detailed-input" />
               <label>Time:</label>
-              <input
-                type="text"
-                value={newBill.time}
-                readOnly
-                className="input"
-              />
-              <button onClick={handleCreateBill} className="add-button">Create</button>
+              <input type="text" value={newBill.time} readOnly className="detailed-input" />
+              <button onClick={handleCreateBill} className="detailed-add-button">
+                Create
+              </button>
             </div>
           </div>
         )}
         {bills.map((bill, index) => (
-          <div key={index} className="bill-card">
-            <div className="bill-header" onClick={() => handleBillClick(index)}>
+          <div key={index} className="detailed-bill-card">
+            <div className="detailed-bill-header" onClick={() => handleBillClick(index)}>
               <p>{bill.id}</p>
-              <button className="expand-button">{bill.expanded ? '-' : '+'}</button>
+              <p>{bill.date}</p>
+              <p>{bill.time}</p>
+              <button className="detailed-expand-button">{bill.expanded ? '-' : '+'}</button>
             </div>
             {bill.expanded && (
               <DistributionBill
@@ -239,31 +212,31 @@ console.log(bills)
         ))}
       </div>
       {showAddProductModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={() => setShowAddProductModal(false)}>&times;</span>
+        <div className="detailed-modal">
+          <div className="detailed-modal-content">
+            <span className="detailed-close" onClick={() => setShowAddProductModal(false)}>
+              &times;
+            </span>
             <h2>Add Product</h2>
             <input
               type="text"
               placeholder="Search and add product"
               value={searchTerm}
               onChange={handleSearchChange}
-              className="input"
+              className="detailed-input"
             />
-            <div className="search-suggestions">
+            <div className="detailed-search-suggestions">
               {searchSuggestions.map((product, index) => (
-                <div
-                  key={index}
-                  className="suggestion"
-                  onClick={() => setSelectedProduct(product)}
-                >
+                <div key={index} className="detailed-suggestion" onClick={() => setSelectedProduct(product)}>
                   <div>{product.id}</div>
                   <div>{product.productName}</div>
                   <div>{product.brand}</div>
                 </div>
               ))}
             </div>
-            <button onClick={handleAddProduct} className="add-button">Add Product</button>
+            <button onClick={handleAddProduct} className="detailed-add-button">
+              Add Product
+            </button>
           </div>
         </div>
       )}

@@ -1,15 +1,10 @@
-// AddProductDialog.js
-
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AddProductDialog.css';
-import VariantDisplay from './VariantDisplay';
 import { addProductToDatabase, editProducts } from '../../Database/Database';
+import VariantDisplay from './VariantDisplay';
 
 function AddProductDialog({ onClose, onChange, product }) {
-    const [newVariant, setNewVariant] = useState('');
-    const [variants, setVariants] = useState([]);
-    const [variantDisplayVisible, setVariantDisplayVisible] = useState(false);
-    const variantInputRefs = useRef([]);
+    const [isAddProduct, setIsAddProduct] = useState(null);
 
     const [id, setId] = useState('');
     const [brand, setBrand] = useState('');
@@ -23,14 +18,15 @@ function AddProductDialog({ onClose, onChange, product }) {
     const [tax, setTax] = useState('');
     const [distributorName, setDistributorName] = useState('');
     const [gstNo, setGstNo] = useState('');
-    const [heading, setHeading] = useState('Add Product');
-    const [buttonText, setButtonText] = useState('Add');
-    const [generatedVariants, setGeneratedVariants] = useState([]);
+    const [variants, setVariants] = useState([]);
+    const [heading, setHeading] = useState("Add Product");
+    const [buttonText, setButtonText] = useState("Add");
 
     useEffect(() => {
-        if (product !== null && product) {
-            setHeading('Edit Product');
-            setButtonText('Edit');
+        if (product) {
+            setHeading("Edit Product");
+            setButtonText("Edit");
+            setIsAddProduct(false);
             setId(product.id);
             setBrand(product.brand);
             setProductName(product.productName);
@@ -44,183 +40,142 @@ function AddProductDialog({ onClose, onChange, product }) {
             setDistributorName(product.distributorName);
             setGstNo(product.gstNo);
             setVariants(product.variants);
-            setGeneratedVariants(product.generatedVariants);
         } else {
-            console.log("Adding Product");
+            setIsAddProduct(true);
         }
     }, [product]);
 
-    const handleAddVariant = () => {
-        const newVariantInputRefs = [...variantInputRefs.current, []];
-        variantInputRefs.current = newVariantInputRefs;
-        setVariants([...variants, { variantName: newVariant, options: [{ name: '' }] }]);
-        setNewVariant('');
-    };
-
-    const handleRemoveVariant = (index) => {
-        const updatedVariants = [...variants];
-        updatedVariants.splice(index, 1);
-        setVariants(updatedVariants);
-        const newVariantInputRefs = [...variantInputRefs.current];
-        newVariantInputRefs.splice(index, 1);
-        variantInputRefs.current = newVariantInputRefs;
-    };
-
-    const handleAddOption = (variantIndex) => {
-        const updatedVariants = [...variants];
-        updatedVariants[variantIndex].options.push({ name: '' });
-        setVariants(updatedVariants);
-
-        const lastIndex = updatedVariants[variantIndex].options.length - 1;
-        const optionInputRef = variantInputRefs.current[variantIndex][lastIndex];
-        if (optionInputRef && optionInputRef.current) {
-            optionInputRef.current.focus();
+    const handleAddVariant = (e) => {
+        if (e.key === 'Enter') {
+            setVariants([...variants, { variantName: e.target.value, options: [] }]);
+            e.target.value = '';
         }
     };
 
-    const handleRemoveOption = (variantIndex, optionIndex) => {
-        const updatedVariants = [...variants];
-        updatedVariants[variantIndex].options.splice(optionIndex, 1);
-        setVariants(updatedVariants);
-    };
-
-    const handleVariantInputChange = (e) => {
+    const handleAddOption = (variantIndex, e) => {
         if (e.key === 'Enter') {
-            handleAddVariant();
-        } else {
-            setNewVariant(e.target.value);
-        }
-    };
-
-    const handleOptionInputChange = (variantIndex, optionIndex, e) => {
-        if (e.key === 'Enter') {
-            handleAddOption(variantIndex);
-        } else {
             const updatedVariants = [...variants];
-            updatedVariants[variantIndex].options[optionIndex].name = e.target.value;
+            updatedVariants[variantIndex].options.push({ name: e.target.value, quantity: quantity, unit: unit, buyPrice: buyPrice, sellPrice: sellPrice, tax: tax });
             setVariants(updatedVariants);
+            e.target.value = '';
         }
     };
 
-
-    const handleSubmit = () => {
-        // Arrays to store variant names and option names
-        const variantNamesArray = [];
-        const optionsArray = [];
-    
-        // Loop through each variant to extract names and options
-        variants.forEach(variant => {
-            // Push variant name into variantNamesArray
-            variantNamesArray.push(variant.variantName);
-    
-            // Extract option names, sort them, and push into optionsArray
-            const sortedOptions = variant.options.map(option => option.name).sort();
-            optionsArray.push(sortedOptions);
-        });
-    
-        // Generate combinations of options
-        const combinations = [];
-        const generateCombinations = (index, current) => {
-            if (index === optionsArray.length) {
-                combinations.push(current);
-                return;
-            }
-            optionsArray[index].forEach(option => {
-                generateCombinations(index + 1, [...current, option]);
-            });
-        };
-        generateCombinations(0, []);
-    
-        // Create products for each combination of options
-        const products = [];
-        combinations.forEach(combination => {
-            // Create product name by concatenating variant names and option names
-            const productName = combination.map((option, index) => `${variantNamesArray[index]}: ${option}`).join(', ');
-    
-            // Create product object
-            const product = {
-                id: "", // Generate a unique ID for each product (you may need to import uuidv4)
-                brand,
-                productName,
-                category,
-                quantity,
-                unit,
-                description,
-                buyPrice,
-                sellPrice,
-                tax,
-                distributorName,
-                gstNo,
-                variants,
-                generatedVariants,
-                variantNames: variantNamesArray,
-                options: optionsArray,
-            };
-    
-            products.push(product);
-        });
-    
-        // Log details of each product
-        products.forEach(product => {
-            console.log(product)
-        });
-    
-        // Update or add products to the database (not implemented here)
-        if (buttonText === 'Edit') {
-            // editProducts(productData);
-        } else {
-            // addProductToDatabase(productData);
-        }
-    
+    const handleCancel = () => {
         onClose();
         onChange();
     };
-    
-    
-    
 
-    const handleSaveVariants = (generatedVariants) => {
-        setGeneratedVariants(generatedVariants);
-    };
+    const generateProductCombinations = (variants) => {
+        if (!variants.length) return [];
 
-    const generateCombinations = () => {
-        const combinations = [];
-        const recursion = (index, current) => {
-            if (index === variants.length) {
-                combinations.push(current);
-                return;
+        const combine = (acc, variant) => {
+            if (!acc.length) {
+                return variant.options.map(option => ({ name: option.name, options: [option] }));
             }
-            variants[index].options.forEach((option) => {
-                recursion(index + 1, [...current, { [variants[index].variantName]: option.name }]);
-            });
+
+            const combinations = [];
+            for (const option of variant.options) {
+                for (const item of acc) {
+                    combinations.push({
+                        name: `${item.name} ${option.name}`,
+                        options: [...item.options, option]
+                    });
+                }
+            }
+            return combinations;
         };
-        recursion(0, []);
-        setVariantDisplayVisible(true);
+
+        return variants.reduce(combine, []);
     };
+
+    const handleSubmit = () => {
+        const baseProduct = {
+            id,
+            brand,
+            productName,
+            category,
+            description,
+            quantity,
+            unit,
+            buyPrice,
+            sellPrice,
+            tax,
+            distributorName,
+            gstNo,
+            variants
+        };
+
+        if (buttonText === "Edit") {
+            editProducts(baseProduct);
+        } else {
+            if (addProductToDatabase(baseProduct)) {
+                console.log("Product added to database");
+            } else {
+                console.error("Error adding product to database");
+            }
+        }
+
+        const combinations = generateProductCombinations(variants);
+
+        combinations.forEach(combination => {
+            const combinedProduct = {
+                ...baseProduct,
+                productName: `${productName} ${combination.name}`,
+                variants: []
+            };
+
+            if (buttonText === "Edit") {
+                editProducts(combinedProduct);
+            } else {
+                if (addProductToDatabase(combinedProduct)) {
+                    console.log("Product combination added to database");
+                } else {
+                    console.error("Error adding product combination to database");
+                }
+            }
+        });
+
+        onChange();
+        onClose();
+    };
+
+    useEffect(() => {
+        const updatedVariants = variants.map(variant => ({
+            ...variant,
+            options: variant.options.map(option => ({
+                ...option,
+                quantity: quantity || option.quantity,
+                buyPrice: buyPrice || option.buyPrice,
+                sellPrice: sellPrice || option.sellPrice,
+            }))
+        }));
+        setVariants(updatedVariants);
+    }, [quantity, buyPrice, sellPrice]);
 
     return (
-        <div>
-            <div className="product-form card">
+        <div className="addproduct-dialog-overlay">
+            <div className="addproduct-dialog">
                 <h2>{heading}</h2>
-                <div className="form-row">
-                    <div className="input-field">
+                <div className="addproduct-form-row">
+                    <div className="addproduct-input-field">
                         <input type="text" placeholder="ID" value={id} onChange={(e) => setId(e.target.value)} />
                     </div>
-                    <div className="input-field">
+                    <div className="addproduct-input-field">
                         <input type="text" placeholder="Brand" value={brand} onChange={(e) => setBrand(e.target.value)} />
                     </div>
-                    <div className="input-field">
+                    <div className="addproduct-input-field">
                         <input type="text" placeholder="Product Name" value={productName} onChange={(e) => setProductName(e.target.value)} />
                     </div>
                 </div>
-                <div className="form-row">
-                    <div className="input-field">
+                <div className="addproduct-form-row">
+                    <div className="addproduct-input-field">
                         <input type="text" placeholder="Category" value={category} onChange={(e) => setCategory(e.target.value)} />
                     </div>
-                    <div className="input-field">
+                    <div className="addproduct-input-field">
                         <input type="text" placeholder="Quantity" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
                     </div>
-                    <div className="input-field">
+                    <div className="addproduct-input-field">
                         <select value={unit} onChange={(e) => setUnit(e.target.value)}>
                             <option value="Nos">Nos</option>
                             <option value="Kg">Kg</option>
@@ -230,68 +185,55 @@ function AddProductDialog({ onClose, onChange, product }) {
                         </select>
                     </div>
                 </div>
-                <div className="form-row">
-                    <div className="input-field">
-                        <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+                <div className="addproduct-form-row">
+                    <div className="addproduct-input-field">
+                        <input type="text" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
                     </div>
                 </div>
-                <div className="form-row">
-                    <div className="input-field">
+                <div className="addproduct-form-row">
+                    <div className="addproduct-input-field">
                         <input type="text" placeholder="Buy Price" value={buyPrice} onChange={(e) => setBuyPrice(e.target.value)} />
                     </div>
-                    <div className="input-field">
+                    <div className="addproduct-input-field">
                         <input type="text" placeholder="Sell Price" value={sellPrice} onChange={(e) => setSellPrice(e.target.value)} />
                     </div>
-                    <div className="input-field">
+                    <div className="addproduct-input-field">
                         <input type="number" min="0" max="100" step="0.01" placeholder="Tax (%)" value={tax} onChange={(e) => setTax(e.target.value)} />
                     </div>
                 </div>
-                <div className="form-row">
-                    <div className="input-field">
+                <div className="addproduct-form-row">
+                    <div className="addproduct-input-field">
                         <input type="text" placeholder="Distributor Name" value={distributorName} onChange={(e) => setDistributorName(e.target.value)} />
                     </div>
-                    <div className="input-field">
+                    <div className="addproduct-input-field">
                         <input type="text" placeholder="GST No" value={gstNo} onChange={(e) => setGstNo(e.target.value)} />
                     </div>
                 </div>
-                <hr />
-                {variants.map((variant, variantIndex) => (
-                    <div key={variantIndex}>
-                        <div>{variant.variantName}</div>
-                        {variant.options.map((option, optionIndex) => (
-                            <div className="option-viewer" key={optionIndex}>
-                                <input
-                                    type="text"
-                                    value={option.name}
-                                    onChange={(e) => handleOptionInputChange(variantIndex, optionIndex, e)}
-                                    onKeyDown={(e) => { if (e.key === 'Enter') handleAddOption(variantIndex) }}
-                                    placeholder="Enter Option Name"
-                                    ref={(inputRef) => {
-                                        variantInputRefs.current[variantIndex] = variantInputRefs.current[variantIndex] || [];
-                                        variantInputRefs.current[variantIndex][optionIndex] = inputRef;
-                                    }}
-                                />
-                                <button onClick={() => handleRemoveOption(variantIndex, optionIndex)} className="btn-action">Remove</button>
-                            </div>
-                        ))}
-                        <button onClick={() => handleAddOption(variantIndex)} className="btn-action">Add Option</button>
-                        <button onClick={() => handleRemoveVariant(variantIndex)} className="btn-action">Remove Variant</button>
+                <div className="addproduct-variant-form">
+                    <label>Variants and Options</label>
+                    <div className="addproduct-variant-input">
+                        <input type="text" placeholder="Enter Variant Name" onKeyPress={handleAddVariant} />
                     </div>
-                ))}
-                <div className="-variant-form-row">
-                    <input
-                        type="text"
-                        value={newVariant}
-                        onChange={handleVariantInputChange}
-                        onKeyDown={(e) => { if (e.key === 'Enter') handleAddVariant() }}
-                        placeholder="Enter Variant Name"
-                    />
-                    <button onClick={handleAddVariant} className="btn-action">+</button>
+                    {variants.map((variant, index) => (
+                        <div key={index} className="addproduct-variant">
+                            <div className="addproduct-variant-name">
+                                <h4>{variant.variantName}</h4>
+                                <input type="text" placeholder={`Add option for ${variant.variantName}`} onKeyPress={(e) => handleAddOption(index, e)} />
+                            </div>
+                            <div className="addproduct-options">
+                                {variant.options.map((option, optionIndex) => (
+                                    <div key={optionIndex} className="addproduct-option">
+                                        <span>{option.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
                 </div>
-                <VariantDisplay variants={variants} product={product} generatedVariants={generatedVariants} onSave={handleSaveVariants} />
-                <div className="form-buttons">
-                    <button onClick={handleSubmit} className="btn-add">{buttonText}</button>
-                    <button onClick={onClose} className="btn-cancel">Cancel</button>
+                <VariantDisplay variants={variants} product={product} onSave={(variants) => setVariants(variants)} />
+                <div className="addproduct-form-buttons">
+                    <button className="addproduct-btn-add" onClick={handleSubmit}>{buttonText}</button>
+                    <button className="addproduct-btn-cancel" onClick={handleCancel}>Cancel</button>
                 </div>
             </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import '../Home/Home.css';
+import './../Home/Home.css'
 
 const Navbar = () => {
   const [navbarVisible, setNavbarVisible] = useState(true);

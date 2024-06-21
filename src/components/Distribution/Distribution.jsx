@@ -3,7 +3,7 @@ import './Distribution.css';
 import { addDistributorToDatabase, getAllDistributor } from '../../Database/Database';
 import DetailedDistribution from './DetailedDistribution';
 
-function Distribution({products}) {
+function Distribution({ products }) {
   const [showAddDistributorForm, setShowAddDistributorForm] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [newDistributor, setNewDistributor] = useState({
@@ -39,15 +39,11 @@ function Distribution({products}) {
     const term = event.target.value;
     setSearchTerm(term);
 
-    // Filter distributors based on search term
     if (term.trim() !== '') {
-      const suggestions = distributors.filter((distributor) => {
-        return (
-          distributor.id.includes(term) ||
-          distributor.name.toLowerCase().includes(term.toLowerCase())
-        );
-      });
-
+      const suggestions = distributors.filter((distributor) =>
+        distributor.id.includes(term) ||
+        distributor.name.toLowerCase().includes(term.toLowerCase())
+      );
       setSearchSuggestions(suggestions);
     } else {
       setSearchSuggestions([]);
@@ -95,22 +91,21 @@ function Distribution({products}) {
   return (
     <div className="distribution-container">
       {showDetailedDistribution ? (
-        <DetailedDistribution distributor={selectedDistributor} onBackClick={handleBackClick} products={products}/>
+        <DetailedDistribution distributor={selectedDistributor} onBackClick={handleBackClick} products={products} />
       ) : (
         <>
           <div className="header">
-            <div className="search-bar">
-              {showSearchBar && (
-                <input
-                  type="text"
-                  placeholder="Add distributor"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  onKeyPress={handleKeyPress}
-                />
-              )}
+            <div className={`search-bar-container ${showSearchBar ? 'active' : ''}`}>
+              <input
+                type="text"
+                placeholder="Search distributor"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onKeyPress={handleKeyPress}
+                className={showSearchBar ? 'visible' : ''}
+              />
               <button onClick={() => setShowSearchBar(!showSearchBar)}>
-                {showSearchBar ? 'Cancel' : 'Purchase'}
+                {showSearchBar ? 'Cancel' : 'Search'}
               </button>
             </div>
             {showSearchBar && (
@@ -131,13 +126,6 @@ function Distribution({products}) {
                 )}
               </div>
             )}
-            <div className="header-fields">
-              {!selectedDistributor && (
-                <div className="add-distributor-button">
-                  <button onClick={handleAddDistributor}>+ Add Distributor</button>
-                </div>
-              )}
-            </div>
           </div>
           {showAddDistributorForm && (
             <div className="popup-cardview">
@@ -182,21 +170,28 @@ function Distribution({products}) {
               </div>
             </div>
           )}
-          <div className="distributor-list">
-            {distributors.map((distributor, index) => (
-              <div
-                key={index}
-                className="distributor-card"
-                onClick={() => handleSelectDistributor(distributor)}
-              >
-                <div className="distributor-details">
-                  <h3>{distributor.name}</h3>
-                  <p>ID: {distributor.id}</p>
-                  <p>Contact: {distributor.contact}</p>
-                  <p>Comments: {distributor.comments}</p>
-                </div>
-              </div>
-            ))}
+          <table className="distributor-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Comments</th>
+              </tr>
+            </thead>
+            <tbody>
+              {distributors.map((distributor, index) => (
+                <tr key={index} onClick={() => handleSelectDistributor(distributor)}>
+                  <td>{distributor.id}</td>
+                  <td>{distributor.name}</td>
+                  <td>{distributor.contact}</td>
+                  <td>{distributor.comments}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="add-distributor-button">
+            <button onClick={handleAddDistributor}>+ Add Distributor</button>
           </div>
         </>
       )}

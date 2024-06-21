@@ -15,6 +15,10 @@ const Inventory = () => {
   });
   const [selectedInventory, setSelectedInventory] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
+  const [showSearchBar, setShowSearchBar] = useState(false);
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     getAllInventoryFromDatabase();
@@ -28,6 +32,44 @@ const Inventory = () => {
     } catch (error) {
       console.error('Error fetching inventory:', error);
     }
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter' && searchSuggestions.length > 0) {
+      handleSelectProduct(searchSuggestions[0]);
+    }
+  };
+
+  const handleSelectProduct = (selectedProduct) => {
+    setSelectedInventory(selectedProduct);
+    setSearchTerm('');
+    setSearchSuggestions([]);
+    setShowSearchBar(false); // Hide search bar after selection, adjust as per UI/UX
+    setShowAddInventoryForm(false); // Reset any form visibility state, adjusted from setShowAddProductForm
+    setShowAddInventoryForm(true); // Adjust if necessary based on inventory details
+  };
+
+  const handleAdd = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value;
+    setSearchTerm(searchTerm);
+
+    // Filter products based on search term
+    const filteredProducts = allProducts.filter(product => {
+      return (
+        product.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        // Add other fields as needed for search
+        product.distributorName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    });
+
+    setSearchSuggestions(filteredProducts);
   };
 
   const fetchAllProducts = async () => {
@@ -84,13 +126,40 @@ const Inventory = () => {
 
   return (
     <div className="cool-component">
-      <div className="search-bar">
-        <input type="text" placeholder="Search..." />
-        <button>Search</button>
+      <div className="header">
+        <div className={`search-bar-container ${showSearchBar ? 'active' : ''}`}>
+          <input
+            type="text"
+            placeholder="Search product"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            onKeyPress={handleKeyPress}
+            className={showSearchBar ? 'visible' : ''}
+          />
+          <button onClick={() => setShowSearchBar(!showSearchBar)}>
+            {showSearchBar ? 'Cancel' : 'Search'}
+          </button>
+        </div>
+        {showSearchBar && (
+          <div className="search-suggestions">
+            {searchSuggestions.map((product, index) => (
+              <div
+                key={index}
+                className="suggestion"
+                onClick={() => handleSelectProduct(product)}
+              >
+                {product.productName} {/* Display relevant information */}
+              </div>
+            ))}
+            {searchSuggestions.length === 0 && searchTerm && (
+              <div className="create-new" onClick={handleAdd}>
+                Create new Product
+              </div>
+            )}
+          </div>
+        )}
       </div>
-      <div className="add-inventory-button">
-        <button onClick={handleAddInventory}>+ Add Inventory</button>
-      </div>
+
       {showAddInventoryForm && (
         <div className="popup-cardview">
           <div className="popup-content">
@@ -131,14 +200,28 @@ const Inventory = () => {
           </div>
         </div>
       )}
-      <div className="inventory-cards">
-        {inventoryData.map((inventory, index) => (
-          <div key={index} className="inventory-card" onClick={() => handleInventoryClick(inventory)}>
-            <p>{inventory.id}</p>
-            <p>{inventory.name}</p>
-            <p>{inventory.location}</p>
-          </div>
-        ))}
+      <div className="inventory-table">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Location</th>
+            </tr>
+          </thead>
+          <tbody>
+            {inventoryData.map((inventory, index) => (
+              <tr key={index} onClick={() => handleInventoryClick(inventory)}>
+                <td>{inventory.id}</td>
+                <td>{inventory.name}</td>
+                <td>{inventory.location}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      <div className="add-inventory-button">
+        <button onClick={handleAddInventory}>+ Add Inventory</button>
+      </div>
       </div>
     </div>
   );

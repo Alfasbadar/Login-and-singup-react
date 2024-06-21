@@ -1,122 +1,111 @@
-/* AddProductDialog.css */
 
-.product-form {
-  background-color: #1e1e1e;
-  color: #ffffff;
-  padding: 15px;
-  border-radius: 20px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+.addproduct-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .addproduct-dialog {
+    width: 100%; /* adjust as needed */
+    max-width: 600px; /* adjust as needed */
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+  
+.addproduct-form {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-.product-form h2 {
-  margin-bottom: 15px;
-  font-size: 20px;
+.addproduct-form-row {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
 }
 
-.form-row {
-  display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
+.addproduct-input-field {
+    flex: 1;
 }
 
-.input-field {
-  flex: 1;
-  margin-bottom: 10px;
+.addproduct-input-field input,
+.addproduct-input-field select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    box-sizing: border-box;
 }
 
-.input-field input, .input-field select, .input-field textarea {
-  width: 100%;
-  padding: 8px;
-  border: none;
-  border-radius: 8px;
-  background-color: #333333;
-  color: #ffffff;
-  outline: none;
+.addproduct-variant-form {
+    margin-top: 20px;
 }
 
-.input-field input::placeholder, .input-field select::placeholder, .input-field textarea::placeholder {
-  color: #aaaaaa;
+.addproduct-variant-input {
+    display: flex;
+    margin-bottom: 10px;
 }
 
-.form-buttons {
-  margin-top: 15px;
-  display: flex;
-  justify-content: flex-end;
+.addproduct-variant-input input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
 }
 
-.btn-add, .btn-cancel {
-  padding: 8px 15px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
+.addproduct-variant {
+    margin-bottom: 10px;
 }
 
-.btn-add {
-  background-color: #009688;
-  color: #ffffff;
-  margin-right: 10px;
+.addproduct-variant-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
 }
 
-.btn-cancel {
-  background-color: #ff5722;
-  color: #ffffff;
+.addproduct-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-.option-viewer {
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
+.addproduct-option {
+    padding: 5px 10px;
+    background-color: #eaeaea;
+    border-radius: 25px;
 }
 
-.option-viewer input {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  border-radius: 8px;
-  background-color: #333333;
-  color: #ffffff;
-  outline: none;
-  margin-right: 10px;
+.addproduct-form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
 }
 
-.option-viewer button {
-  padding: 8px 15px;
-  border: none;
-  background-color: #757575;
-  color: #ffffff;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
+.addproduct-btn-add,
+.addproduct-btn-cancel {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
-.option-viewer button:hover {
-  background-color: #555555;
+.addproduct-btn-add {
+    background-color: #4caf50;
+    color: white;
 }
 
--variant-form-row {
-  display: flex;
-  align-items: center;
-  margin-top: 15px;
-}
-
-input {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  border-radius: 8px;
-  background-color: #333333;
-  color: #ffffff;
-  outline: none;
-  margin-right: 10px;
-}
-
-button {
-  padding: 8px 15px;
-  border: none;
-  border-radius: 8px;
-  background-color: #009688;
-  color: #ffffff;
-  cursor: pointer;
-  font-size: 14px;
+.addproduct-btn-cancel {
+    background-color: #f44336;
+    color: white;
 }

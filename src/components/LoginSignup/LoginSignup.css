@@ -8,18 +8,20 @@
 }
 
 .container{
-  display: grid;
+  justify-items: center;
+  justify-content: center;
+  padding-top: 100px;
   height: 100%;
   width: 100%;
-  place-items: center;
 }
 
 ::selection {
-  background: #1a75ff;
+  background: #000000;
   color: #fff;
 }
 
 .wrapper {
+  
   overflow: hidden;
   max-width: 390px;
   background: hwb(0 100% 0% / 0.403);
@@ -151,9 +153,9 @@ input[type="radio"] {
   transition: all 0.3s ease;
 }
 
-form .field input:focus::placeholder {
+/* form .field input:focus::placeholder {
   color: #1e1e1e;
-}
+} */
 
 .form-inner form .pass-link {
   margin-top: 5px;
@@ -163,12 +165,12 @@ form .field input:focus::placeholder {
   text-align: center;
   margin-top: 30px;
 }
-
+/* 
 .form-inner form .pass-link a,
 .form-inner form .signup-link a {
   color: #000000;
   text-decoration: none;
-}
+} */
 
 .form-inner form .pass-link a:hover,
 .form-inner form .signup-link a:hover {
