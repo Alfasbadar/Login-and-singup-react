@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './DetailedDistribution.css';
 import DistributionBill from './DistributionBill';
 import { distributorCreateBill, retrieveBills, deleteBill } from '../../Database/Database';
@@ -18,26 +18,24 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
   const [showAddProductModal, setShowAddProductModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchSuggestions, setSearchSuggestions] = useState([]);
-  const [selectedBillIndex, setSelectedBillIndex] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [showOptions, setShowOptions] = useState(null); // To manage options menu
   const searchRef = useRef(null);
+
+  const loadBills = useCallback(async () => {
+    try {
+      const distributorBills = await retrieveBills(distributor.id);
+      setBills(distributorBills);
+    } catch (error) {
+      console.error('Error loading bills:', error);
+    }
+  }, [distributor.id]);
 
   useEffect(() => {
     // Load bills when component mounts
     loadBills();
-  }, []);
-
-  const loadBills = async () => {
-    try {
-      const distributorBills = await retrieveBills(distributor.id);
-      setBills(distributorBills);
-      console.log('Calling bills from detailed distributor bills');
-      console.log(bills, distributorBills);
-    } catch (error) {
-      console.error('Error loading bills:', error);
-    }
-  };
+  }, [loadBills]);
 
   const handleNewBillClick = () => {
     setShowAddBillModal(true);
@@ -45,7 +43,7 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
 
   const handleCreateBill = async () => {
     try {
-      const createdBill = await distributorCreateBill(newBill, distributor);
+      // const createdBill = await distributorCreateBill(newBill, distributor);
       setBills([...bills, newBill]);
       setShowAddBillModal(false);
       setNewBill({
@@ -73,42 +71,35 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
   };
 
   const handleOnBillClick = (addedProducts, billId) => {
-    console.log('handle on bill click');
-    console.log('bill click Detailed Distribution');
-    console.log(products); // add the products inside the bill and console the bill.
-    console.log(billId);
     const updatedBill = {
       ...newBill,
       products: addedProducts,
     };
     updatedBill.id = billId;
-    console.log(updatedBill);
     setNewBill(updatedBill);
 
-    // Console log the entire updated bill
-    console.log('Updated Bill:', updatedBill);
-
-    console.log(distributor.id);
-    console.log(bills);
-
-    // Delete old bill
     if (deleteBill(distributor.id, billId)) {
-      console.log('Bill deleted for updation');
-      if (distributorCreateBill(updatedBill, distributor)) console.log('Bill updated with products');
+      if (distributorCreateBill(updatedBill, distributor))
+        console.log('Bill updated with products');
     }
-
-    // Update with new bill
   };
 
-  const handleBillClick = async (index) => {
-    console.log('handleBillClick >>>');
-    setSelectedBillIndex(index);
+  const handleBillClick = (index) => {
     setBills((prevBills) => {
       const updatedBills = prevBills.map((bill, i) => {
         return { ...bill, expanded: i === index ? !bill.expanded : false };
       });
       return updatedBills;
     });
+  };
+
+  const handleDeleteBill = async (billId) => {
+    try {
+      await deleteBill(distributor.id, billId);
+      setBills(bills.filter((bill) => bill.id !== billId));
+    } catch (error) {
+      console.error('Error deleting bill:', error);
+    }
   };
 
   const handleSearchChange = (e) => {
@@ -140,6 +131,19 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
     setSelectedProduct(product);
   };
 
+  const handleOptionsClick = (index) => {
+    setShowOptions(index === showOptions ? null : index);
+  };
+
+  const handleOptionClick = (action, billId, index) => {
+    setShowOptions(null);
+    if (action === 'expand') {
+      handleBillClick(index);
+    } else if (action === 'delete') {
+      handleDeleteBill(billId);
+    }
+  };
+
   return (
     <div className="detailed-distribution-container">
       <div className="header">
@@ -158,59 +162,87 @@ function DetailedDistribution({ distributor, onBackClick, products }) {
             + Bill
           </button>
         </div>
-        {showAddBillModal && (
-          <div className="detailed-modal">
-            <div className="detailed-modal-content">
-              <span className="detailed-close" onClick={() => setShowAddBillModal(false)}>
-                &times;
-              </span>
-              <h2>New Bill</h2>
-              <input
-                type="text"
-                placeholder="Enter Bill ID"
-                value={newBill.id}
-                onChange={(e) => setNewBill({ ...newBill, id: e.target.value })}
-                className="detailed-input"
-              />
-              <label>Date:</label>
-              <input type="text" value={newBill.date} readOnly className="detailed-input" />
-              <label>Time:</label>
-              <input type="text" value={newBill.time} readOnly className="detailed-input" />
-              <button onClick={handleCreateBill} className="detailed-add-button">
-                Create
-              </button>
-            </div>
-          </div>
-        )}
-        {bills.map((bill, index) => (
-          <div key={index} className="detailed-bill-card">
-            <div className="detailed-bill-header" onClick={() => handleBillClick(index)}>
-              <p>{bill.id}</p>
-              <p>{bill.date}</p>
-              <p>{bill.time}</p>
-              <button className="detailed-expand-button">{bill.expanded ? '-' : '+'}</button>
-            </div>
-            {bill.expanded && (
-              <DistributionBill
-                billid={bill.id}
-                bills={bills}
-                index={index}
-                searchTerm={searchTerm}
-                searchSuggestions={searchSuggestions}
-                isSearchFocused={isSearchFocused}
-                onSearchChange={handleSearchChange}
-                onSearchFocus={handleSearchFocus}
-                onSearchBlur={handleSearchBlur}
-                onSuggestionClick={handleSuggestionClick}
-                searchRef={searchRef}
-                products={products}
-                distributor={distributor}
-                onBillClick={handleOnBillClick}
-              />
-            )}
-          </div>
-        ))}
+        <table className="bill-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {bills.map((bill, index) => (
+              <React.Fragment key={index}>
+                <tr className="bill-row" onClick={() => handleBillClick(index)}>
+                  <td>{bill.id}</td>
+                  <td>{bill.date}</td>
+                  <td>{bill.time}</td>
+                  <td>
+                    <div className="options-menu" onClick={(e) => e.stopPropagation()}>
+                      <button onClick={() => handleOptionsClick(index)}>⋮</button>
+                      {showOptions === index && (
+                        <div className="options-dropdown">
+                          <button onClick={() => handleOptionClick('expand', bill.id, index)}>Expand</button>
+                          <button onClick={() => handleOptionClick('delete', bill.id, index)}>Delete</button>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+                {bill.expanded && (
+                  <tr key={`expanded-${index}`} className="expanded-row">
+                    <td colSpan="4">
+                      <div className="detailed-bill-card">
+                        <DistributionBill
+                          billid={bill.id}
+                          bills={bills}
+                          index={index}
+                          searchTerm={searchTerm}
+                          searchSuggestions={searchSuggestions}
+                          isSearchFocused={isSearchFocused}
+                          onSearchChange={handleSearchChange}
+                          onSearchFocus={handleSearchFocus}
+                          onSearchBlur={handleSearchBlur}
+                          onSuggestionClick={handleSuggestionClick}
+                          searchRef={searchRef}
+                          products={products}
+                          distributor={distributor}
+                          onBillClick={handleOnBillClick}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
       </div>
+      {showAddBillModal && (
+        <div className="detailed-modal">
+          <div className="detailed-modal-content">
+            <span className="detailed-close" onClick={() => setShowAddBillModal(false)}>
+              &times;
+            </span>
+            <h2>New Bill</h2>
+            <input
+              type="text"
+              placeholder="Enter Bill ID"
+              value={newBill.id}
+              onChange={(e) => setNewBill({ ...newBill, id: e.target.value })}
+              className="detailed-input"
+            />
+            <label>Date:</label>
+            <input type="text" value={newBill.date} readOnly className="detailed-input" />
+            <label>Time:</label>
+            <input type="text" value={newBill.time} readOnly className="detailed-input" />
+            <button onClick={handleCreateBill} className="detailed-add-button">
+              Create
+            </button>
+          </div>
+        </div>
+      )}
       {showAddProductModal && (
         <div className="detailed-modal">
           <div className="detailed-modal-content">

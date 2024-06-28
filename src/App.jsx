@@ -4,6 +4,7 @@ import LoginSignup from './components/LoginSignup/LoginSignup';
 import { getAuth, onAuthStateChanged } from './config/firebase';
 import Home from './components/Home/Home';
 import LandingPage from './components/LandingPage/LandingPage';
+import loadingGif from './Assets/loading.gif'
 
 function App() {
   const [initializing, setInitializing] = useState(true);
@@ -20,7 +21,11 @@ function App() {
   }, []);
 
   if (initializing) {
-    return <div>Loading...</div>;
+    
+
+    return <div className="loading-container">
+    <img src={loadingGif} alt="Loading..." className="loading-gif" />
+  </div>
   }
 
   return (

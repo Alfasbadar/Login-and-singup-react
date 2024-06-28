@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { login,signup } from "../../Database/Database";
 import './LoginSignup.css'
+// import logo from './../../images/logo.png'
 function LoginSignup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -89,7 +90,7 @@ navigate('/home/dashboard')
                 <span className="error">{passwordError}</span>
               </div>
               <div className="pass-link">
-                <a href="#">Forgot password?</a>
+                {/* <a href="#">Forgot password?</a> */}
               </div>
               <div className="field btn">
                 <div className="btn-layer"></div>

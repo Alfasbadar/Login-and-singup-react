@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './MoveToInventoryPopup.css';
-import {addInventoryToDatabase, deleteInventoryFromDatabase} from '../..//Database/Database'
+import { addInventoryToDatabase, deleteInventoryFromDatabase } from '../../Database/Database';
 
 function MoveToInventoryPopup({ inventoryData, onClose, billID, distributorID }) {
   const [inventories, setInventories] = useState([]);
 
   useEffect(() => {
-    // Check if inventoryData is not empty and update the state
     if (inventoryData && inventoryData.length > 0) {
       setInventories(inventoryData);
     }
@@ -18,55 +17,51 @@ function MoveToInventoryPopup({ inventoryData, onClose, billID, distributorID })
     console.log("Distributor ID", distributorID);
     console.log("Products in inventory", clickedInventory.products);
 
-    // Create a new array containing distributor ID, bill ID, and clicked inventory's products
     const updatedProducts = [
       ...clickedInventory.products,
       {
         distributorID: distributorID,
-        billID: billID
-      }
+        billID: billID,
+      },
     ];
 
+    console.log("After appending distributor and bill", updatedProducts);
 
-    console.log("After appending distrbutor and bill", updatedProducts)
+    clickedInventory.products = updatedProducts;
 
-    console.log("saving products to inventoryItems")
-  
-    clickedInventory.products=updatedProducts;
-  
-    console.log("Products synced with inventory",clickedInventory.products)
+    console.log("Products synced with inventory", clickedInventory.products);
 
-
-    console.log("Updating Inventory database")
-    if(deleteInventoryFromDatabase(clickedInventory._id)){
-        console.log("Inventory deleted")
-        if(addInventoryToDatabase(clickedInventory)){
-            console.log("inventory updated with newly entered bill")
-        }
+    console.log("Updating Inventory database");
+    if (deleteInventoryFromDatabase(clickedInventory._id)) {
+      console.log("Inventory deleted");
+      if (addInventoryToDatabase(clickedInventory)) {
+        console.log("Inventory updated with newly entered bill");
+      }
     }
 
-    onClose(); // Close the popup
+    onClose();
   };
 
-
-  // Map over inventories and display as lists
   const inventoryItems = inventories.map((inventory, index) => (
-    <li key={index} onClick={() => handleInventoryClick(inventory)}>
-      {inventory.id} - {inventory.name} - {inventory.location}
+    <li key={index} onClick={() => handleInventoryClick(inventory)} className="inventory-item">
+      <div className="inventory-id">{inventory.id}</div>
+      <div className="inventory-details">
+        <div className="inventory-name">{inventory.name}</div>
+        <div className="inventory-location">{inventory.location}</div>
+      </div>
     </li>
   ));
-
-  // Log the inventory data
-  console.log("Inventories are consoled:", inventories);
 
   return (
     <div className="move-to-inventory-popup">
       <div className="popup-content">
-        <h2>Inventory</h2>
-        <ul>
+        <div className="popup-header">
+          <h2>Select Inventory</h2>
+        </div>
+        <ul className="inventory-list">
           {inventoryItems}
         </ul>
-        <button className="movetoinventoryclose" onClick={onClose}>Close</button>
+        <button className="move-to-inventory-close" onClick={onClose}>Close</button>
       </div>
     </div>
   );

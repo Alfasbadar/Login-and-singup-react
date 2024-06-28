@@ -14,6 +14,7 @@
 .home-container {
   display: flex;
   flex-direction: column;
+  height: 100vh;
 }
 
 .action-bar {
@@ -67,6 +68,8 @@
 .navbar ul {
   list-style-type: none;
   padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .navbar ul li {
@@ -74,7 +77,9 @@
 }
 
 .navbar ul li a {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
   padding: 10px;
   border-radius: 15px; /* Rounded corners for each menu item */
   color: #000; /* Default text color */
@@ -104,24 +109,45 @@
   transform: translateY(-100%); /* Move the sliding border to the top */
 }
 
-/* Responsive Design for Mobile View */
-@media (max-width: 400px) {
+/* Responsive styles for mobile view */
+@media (max-width: 768px) {
   .navbar-container {
-    width: 50px; /* Adjusted width for icons only */
+    width: 100%; /* Full width on mobile */
+    border-radius: 0; /* No rounded corners on mobile */
+    order: 1; /* Ensure navbar comes before main content */
   }
+
+  .navbar ul {
+    flex-direction: row; /* Horizontal layout for mobile */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent items from wrapping */
+    -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
+    scrollbar-width: none; /* Hide scrollbar in Firefox */
+  }
+
+  .navbar ul::-webkit-scrollbar {
+    display: none; /* Hide scrollbar in WebKit browsers */
+  }
+
   .navbar ul li {
-    display: flex;
-    justify-content: center;
+    margin-bottom: 0;
+    margin-right: 5px; /* Space between items in a row */
   }
+
   .navbar ul li a {
-    padding: 10px 5px; /* Less padding for icons */
-    text-align: center;
+    flex-direction: column; /* Stack icon and text vertically */
+    align-items: center;
+    justify-content: center;
+    font-size: 12px; /* Reduce text size on mobile */
+    padding: 5px; /* Reduce padding on mobile */
   }
+
   .navbar ul li a span {
-    display: none; /* Hide text */
+    display: block;
+    margin-top: 5px; /* Space between icon and text */
   }
-  .navbar ul li a img {
-    width: 20px; /* Size of the icon */
-    height: 20px;
+
+  .content {
+    flex-direction: column; /* Stack content vertically */
   }
 }

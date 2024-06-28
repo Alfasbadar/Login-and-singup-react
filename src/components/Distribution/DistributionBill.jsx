@@ -26,18 +26,23 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
   const handleNameChange = (e) => {
     const { value } = e.target;
     setSearchTerm(value);
+    
+    // Split search query into keywords
+    const keywords = value.toLowerCase().split(' ').filter(keyword => keyword.trim() !== '');
+  
     const results = value ? products.filter(product =>
-      product.productName.toLowerCase().includes(value.toLowerCase()) ||
-      product.id.toLowerCase().includes(value.toLowerCase()) ||
-      product.brand.toLowerCase().includes(value.toLowerCase()) ||
-      product.category.toLowerCase().includes(value.toLowerCase()) ||
-      (product.variants && product.variants.some(variant =>
-        variant.variantName.toLowerCase().includes(value.toLowerCase())
-      ))
+      keywords.every(keyword =>
+        Object.values(product).some(value =>
+          value && typeof value === 'string' && value.toLowerCase().includes(keyword)
+        )
+      )
     ) : [];
+  
     setSearchResults(results);
     setSelectedSuggestionIndex(-1);
   };
+  
+  
 
   const handleSuggestionClick = (product) => {
     if (product.variantName) {
@@ -166,8 +171,8 @@ function DistributionBill({ products, bills, distributor, onBillClick, billid })
       {addedProducts.length > 0 && (
         <div className="bill-products-section">
           <div className="options">
-            <button onClick={handleBillClick}>Bill</button>
-            <button onClick={moveToInventory} disabled={loadingInventory}>
+            <button className="bill-button" onClick={handleBillClick}>Bill</button>
+            <button className="inventory-button" onClick={moveToInventory} disabled={loadingInventory}>
               {loadingInventory ? "Loading Inventory..." : "Move to Inventory"}
             </button>
           </div>

@@ -1,7 +1,4 @@
 .distribution-bill {
-  border: 1px solid #ccc;
-  margin-bottom: 20px;
-  padding: 10px;
 }
 
 .distribution-bill table {
@@ -23,7 +20,6 @@
   margin-left: 10px;
   margin-right: 10px;
 }
-
 
 /* Existing styles */
 .bill-card {
@@ -57,13 +53,12 @@
   overflow-y: hidden;
 }
 
-.search-results{
+.search-results {
   padding: 20px;
 }
 
-.search-results span{
+.search-results span {
   margin-right: 20px;
-
 }
 
 .suggestion {
@@ -114,3 +109,40 @@
   margin-left: 10px;
 }
 
+/* Styles for the Bill and Move to Inventory buttons */
+.bill-products-section .options {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.bill-button,
+.inventory-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.bill-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.bill-button:hover {
+  background-color: #218838;
+}
+
+.inventory-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.inventory-button:hover {
+  background-color: #0056b3;
+}
+
+.inventory-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}

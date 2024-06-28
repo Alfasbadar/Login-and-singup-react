@@ -1,6 +1,6 @@
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-  import { firestore } from '../config/firebase'; // Assuming you have initialized Firestore in firebase.js
-  import { getFirestore, setDoc, addDoc,getDoc,updateDoc, doc,arrayUnion, collection, deleteDoc, getDocs } from 'firebase/firestore'; // Explicitly import getDocs
+  // import { firestore } from '../config/firebase';    (Removed for Production Optimisation)
+  import { getFirestore, setDoc,getDoc, doc, collection, deleteDoc, getDocs } from 'firebase/firestore'; // Explicitly import getDocs
 
   //areyouwatchingclosely
   const logout = async () => {
@@ -204,7 +204,7 @@
       const db = getFirestore();
       
       // Define the document reference for the user distribution
-      const userDistributionRef = doc(collection(db, 'distribution', userEmail, 'userDistribution'), distributorDetails.id);
+      // const userDistributionRef = doc(collection(db, 'distribution', userEmail, 'userDistribution'), distributorDetails.id);  (Removed for Production Optimisation)
       
       // Define the document reference for the distributor
       const distributorDocumentRef = doc(collection(db, 'distribution', userEmail, 'userDistribution'), distributorDetails.id);

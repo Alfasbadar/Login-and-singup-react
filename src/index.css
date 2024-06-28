@@ -11,3 +11,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+/* Loading Styles */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  background: #f0f0f0; /* Adjust background color for loading screen */
+}
+
+.loading-gif {
+  width: 30px; /* Adjust width as per your loading GIF size */
+  height: 30px; /* Adjust height as per your loading GIF size */
+}

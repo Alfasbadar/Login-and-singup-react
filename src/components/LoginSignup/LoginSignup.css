@@ -7,11 +7,16 @@
   font-family: 'Poppins', sans-serif;
 }
 
+
 .container{
-  justify-items: center;
-  justify-content: center;
+  justify-items:auto;
+  justify-content:center;
   padding-top: 100px;
-  height: 100%;
+  min-height: 920px;
+  background-image: url("./../../Assets/background.png");
+  background-size: cover;
+  background-color: #004080;
+  padding-left: 30px;
   width: 100%;
 }
 
@@ -20,17 +25,17 @@
   color: #fff;
 }
 
+
 .wrapper {
   
   overflow: hidden;
   max-width: 390px;
-  background: hwb(0 100% 0% / 0.403);
+  background: hwb(0 100% 0% / 0.278);
   padding: 30px;
   border-radius: 15px;
-  backdrop-filter: blur(3px);
-  box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: #000000;
+  backdrop-filter: blur(20px);
 }
-
 .wrapper .title-text {
   display: flex;
   width: 200%;
@@ -80,7 +85,7 @@
   left: 0;
   z-index: 0;
   border-radius: 15px;
-  background: -webkit-linear-gradient(left, #003366, #004080, #0059b3, #0073e6);
+  background-color: #0073e6;
   transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
@@ -99,11 +104,11 @@ input[type="radio"] {
 }
 
 #signup:checked~label.login {
-  color: #000;
+  color: #ffffff;
 }
 
 #login:checked~label.signup {
-  color: #000;
+  color: #ffffff;
 }
 
 #login:checked~label.login {
@@ -145,7 +150,7 @@ input[type="radio"] {
 }
 
 .form-inner form .field input:focus {
-  border-color: #0053a0;
+  border-color: #0073e6;
 }
 
 .form-inner form .field input::placeholder {
@@ -190,7 +195,7 @@ form .btn .btn-layer {
   width: 300%;
   position: absolute;
   left: -100%;
-  background: -webkit-linear-gradient(right, #003366, #004080, #0059b3, #0073e6);
+  background-color: #0073e6;
   border-radius: 15px;
   transition: all 0.4s ease;
 }
